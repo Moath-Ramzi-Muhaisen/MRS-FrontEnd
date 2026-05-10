@@ -1,0 +1,309 @@
+<!doctype html>
+
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>MRS - Login</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container": "#eeeeee",
+              "on-tertiary-container": "#fcfcff",
+              outline: "#717786",
+              "on-primary": "#ffffff",
+              "surface-container-highest": "#e2e2e2",
+              "surface-variant": "#e2e2e2",
+              "surface-bright": "#f9f9f9",
+              "on-tertiary-fixed-variant": "#40484e",
+              "tertiary-container": "#6e757c",
+              "inverse-on-surface": "#f0f1f1",
+              "on-primary-fixed": "#001a41",
+              "secondary-fixed-dim": "#b7c7e7",
+              "primary-fixed": "#d8e2ff",
+              "tertiary-fixed-dim": "#c0c7cf",
+              "on-surface-variant": "#414755",
+              "on-tertiary": "#ffffff",
+              "on-error-container": "#93000a",
+              "surface-tint": "#005bc1",
+              "on-tertiary-fixed": "#151c22",
+              "primary-container": "#0070eb",
+              "on-error": "#ffffff",
+              surface: "#f9f9f9",
+              "tertiary-fixed": "#dce3eb",
+              "secondary-container": "#ceddfe",
+              "error-container": "#ffdad6",
+              "surface-container-high": "#e8e8e8",
+              secondary: "#505f7a",
+              "inverse-surface": "#2f3131",
+              "on-secondary": "#ffffff",
+              "on-secondary-fixed-variant": "#384761",
+              "surface-container-low": "#f3f3f4",
+              "on-primary-container": "#fefcff",
+              "primary-fixed-dim": "#adc6ff",
+              "on-surface": "#1a1c1c",
+              error: "#ba1a1a",
+              "surface-dim": "#dadada",
+              "on-background": "#1a1c1c",
+              background: "#f9f9f9",
+              primary: "#0058bc",
+              "on-secondary-fixed": "#0b1c34",
+              "inverse-primary": "#adc6ff",
+              tertiary: "#555d63",
+              "outline-variant": "#c1c6d7",
+              "on-secondary-container": "#52617d",
+              "surface-container-lowest": "#ffffff",
+              "secondary-fixed": "#d6e3ff",
+              "on-primary-fixed-variant": "#004493",
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+            spacing: {
+              md: "24px",
+              "margin-mobile": "20px",
+              gutter: "16px",
+              sm: "16px",
+              xl: "48px",
+              xs: "8px",
+              base: "4px",
+              lg: "32px",
+            },
+            fontFamily: {
+              h1: ["Manrope"],
+              "body-md": ["Inter"],
+              "body-lg": ["Inter"],
+              "label-caps": ["Inter"],
+              h3: ["Manrope"],
+              h2: ["Manrope"],
+            },
+            fontSize: {
+              h1: [
+                "32px",
+                {
+                  lineHeight: "40px",
+                  letterSpacing: "-0.02em",
+                  fontWeight: "700",
+                },
+              ],
+              "body-md": [
+                "16px",
+                {
+                  lineHeight: "24px",
+                  letterSpacing: "0em",
+                  fontWeight: "400",
+                },
+              ],
+              "body-lg": [
+                "18px",
+                {
+                  lineHeight: "28px",
+                  letterSpacing: "0em",
+                  fontWeight: "400",
+                },
+              ],
+              "label-caps": [
+                "12px",
+                {
+                  lineHeight: "16px",
+                  letterSpacing: "0.05em",
+                  fontWeight: "600",
+                },
+              ],
+              h3: [
+                "20px",
+                {
+                  lineHeight: "28px",
+                  letterSpacing: "0em",
+                  fontWeight: "600",
+                },
+              ],
+              h2: [
+                "24px",
+                {
+                  lineHeight: "32px",
+                  letterSpacing: "-0.01em",
+                  fontWeight: "600",
+                },
+              ],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+
+  <body
+    class="bg-surface-container-low min-h-screen flex font-body-md text-on-background"
+  >
+    <!-- Left Pane: Image -->
+    <div class="hidden lg:block lg:w-1/2 relative bg-surface-variant">
+      <img
+        alt="Professional medical healthcare environment"
+        class="absolute inset-0 w-full h-full object-cover"
+        data-alt="A bright, modern hospital corridor with a blurred medical professional in the background, representing clinical precision and modern healthcare."
+        src="Images/screen2.png"
+      />
+      <div class="absolute inset-0 bg-primary/10 mix-blend-multiply"></div>
+    </div>
+    <!-- Right Pane: Content -->
+    <div class="w-full lg:w-1/2 flex flex-col min-h-screen">
+      <!-- TopAppBar -->
+      <header
+        class="bg-transparent docked full-width top-0 flat no shadows z-50"
+      >
+        <div
+          class="flex items-center justify-between px-margin-mobile h-16 w-full max-w-7xl mx-auto"
+        >
+          <div
+            class="flex items-center gap-xs cursor-pointer scale-95 active:opacity-80 transition-all hover:bg-surface-container-low dark:hover:bg-surface-variant transition-colors p-2 rounded-lg"
+          >
+            <img
+              alt="Medical Business Logo"
+              class="h-8 w-8 rounded-full object-cover"
+              data-alt="A clean, minimalist medical business logo featuring a stylized blue cross or caduceus integrated with modern typography. The logo is rendered in crisp, high-resolution detail against a pure white background, embodying professional healthcare and trust. The design utilizes a strict palette of deep corporate blue and white, projecting an aura of clinical precision and reliability."
+              src="Images/screen.png"
+            />
+            <h1
+              class="font-h1 text-h1 font-bold text-primary dark:text-primary-fixed"
+            >
+              MRS
+            </h1>
+          </div>
+          <div>
+            <!-- Navigation omitted for login screen -->
+          </div>
+        </div>
+      </header>
+      <!-- Main Content -->
+      <main
+        class="flex-grow flex items-center justify-center px-margin-mobile py-xl"
+      >
+        <!-- Login Card -->
+        <div
+          class="bg-surface-container-lowest w-full max-w-[440px] rounded-[20px] shadow-[0px_10px_30px_rgba(10,27,51,0.05)] p-lg flex flex-col"
+        >
+          <div class="text-center mb-lg">
+            <h2 class="font-h2 text-h2 text-on-surface mb-xs">Welcome back</h2>
+            <p class="font-body-md text-body-md text-on-surface-variant">
+              Log in to your account
+            </p>
+          </div>
+          <form class="flex flex-col gap-md">
+            <!-- Email Field -->
+            <div class="flex flex-col gap-base">
+              <label
+                class="font-label-caps text-label-caps text-on-surface uppercase"
+                for="email"
+                >Email Address</label
+              >
+              <div class="relative">
+                <span
+                  class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant z-10"
+                  data-icon="mail"
+                  >mail</span
+                >
+                <input
+                  class="w-full bg-surface-container-low border-none rounded-lg h-[56px] pl-xl pr-sm focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary focus:outline-none transition-colors font-body-md text-body-md text-on-surface"
+                  id="email"
+                  placeholder="Enter your email"
+                  type="text"
+                />
+              </div>
+            </div>
+            <!-- Password Field -->
+            <div class="flex flex-col gap-base">
+              <label
+                class="font-label-caps text-label-caps text-on-surface uppercase"
+                for="password"
+                >Password</label
+              >
+              <div class="relative">
+                <span
+                  class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant z-10"
+                  data-icon="lock"
+                  >lock</span
+                >
+                <input
+                  class="w-full bg-surface-container-low border-none rounded-lg h-[56px] pl-xl pr-xl focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary focus:outline-none transition-colors font-body-md text-body-md text-on-surface"
+                  id="password"
+                  placeholder="Enter your password"
+                  type="password"
+                />
+                <button
+                  class="absolute right-sm top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors z-10"
+                  type="button"
+                >
+                  <span class="material-symbols-outlined" data-icon="visibility"
+                    >visibility</span
+                  >
+                </button>
+              </div>
+              <div class="flex justify-end mt-xs">
+                <a
+                  class="font-body-md text-body-md text-primary hover:text-primary-fixed-variant transition-colors"
+                  href="#"
+                  >Forgot Password?</a
+                >
+              </div>
+            </div>
+            <!-- Actions -->
+            <div class="flex flex-col gap-sm mt-xs">
+              <button
+                onclick="Login()"
+                class="w-full h-[56px] bg-gradient-to-r from-primary to-primary-container text-on-primary font-h3 text-h3 rounded-lg shadow-[0px_4px_10px_rgba(0,88,188,0.2)] hover:opacity-90 active:scale-[0.98] transition-all"
+                type="button"
+              >
+                Login
+              </button>
+              <button
+                class="w-full h-[56px] bg-transparent border border-outline-variant text-primary font-h3 text-h3 rounded-lg hover:bg-surface-container-low transition-colors active:scale-[0.98]"
+                type="button"
+              >
+                Register
+              </button>
+            </div>
+          </form>
+        </div>
+      </main>
+      <!-- Footer -->
+      <footer
+        class="py-md flex justify-center items-center gap-md bg-transparent mt-auto"
+      >
+        <a
+          class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
+          href="#"
+          >Terms of Service</a
+        >
+        <span class="text-outline-variant text-sm">•</span>
+        <a
+          class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
+          href="#"
+          >Privacy Policy</a
+        >
+        <span class="text-outline-variant text-sm">•</span>
+        <a
+          class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
+          href="#"
+          >Help Center</a
+        >
+      </footer>
+    </div>
+    <script src="mrs.js"></script>
+  </body>
+</html>

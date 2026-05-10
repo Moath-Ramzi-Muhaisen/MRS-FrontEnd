@@ -1,0 +1,469 @@
+<!doctype html>
+
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>MRS Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Manrope:wght@600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              error: "#ba1a1a",
+              "surface-container-high": "#e8e8e8",
+              "inverse-surface": "#2f3131",
+              "on-primary-fixed-variant": "#004493",
+              "on-primary-fixed": "#001a41",
+              "inverse-primary": "#adc6ff",
+              "outline-variant": "#c1c6d7",
+              "on-tertiary": "#ffffff",
+              "on-secondary": "#ffffff",
+              "on-secondary-container": "#52617d",
+              "on-secondary-fixed": "#0b1c34",
+              "tertiary-fixed-dim": "#c0c7cf",
+              "surface-container-lowest": "#ffffff",
+              "on-surface-variant": "#414755",
+              "on-surface": "#1a1c1c",
+              "secondary-fixed-dim": "#b7c7e7",
+              surface: "#f9f9f9",
+              outline: "#717786",
+              "primary-fixed": "#d8e2ff",
+              "on-error-container": "#93000a",
+              "surface-variant": "#e2e2e2",
+              "error-container": "#ffdad6",
+              secondary: "#505f7a",
+              "surface-container-low": "#f3f3f4",
+              "secondary-container": "#ceddfe",
+              "surface-container": "#eeeeee",
+              "surface-container-highest": "#e2e2e2",
+              "primary-fixed-dim": "#adc6ff",
+              primary: "#0058bc",
+              "on-tertiary-container": "#fcfcff",
+              "on-primary": "#ffffff",
+              "on-background": "#1a1c1c",
+              "on-secondary-fixed-variant": "#384761",
+              tertiary: "#555d63",
+              "on-primary-container": "#fefcff",
+              "tertiary-fixed": "#dce3eb",
+              "on-tertiary-fixed": "#151c22",
+              "primary-container": "#0070eb",
+              "on-error": "#ffffff",
+              "surface-dim": "#dadada",
+              background: "#f9f9f9",
+              "surface-bright": "#f9f9f9",
+              "secondary-fixed": "#d6e3ff",
+              "on-tertiary-fixed-variant": "#40484e",
+              "tertiary-container": "#6e757c",
+              "inverse-on-surface": "#f0f1f1",
+              "surface-tint": "#005bc1",
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              card: "20px",
+              full: "9999px",
+            },
+            fontFamily: {
+              headline: ["Manrope", "sans-serif"],
+              display: ["Manrope", "sans-serif"],
+              body: ["Inter", "sans-serif"],
+              label: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      .diffused-shadow {
+        box-shadow: 0px 10px 30px rgba(10, 27, 51, 0.05);
+      }
+      .glass-header {
+        backdrop-filter: blur(8px);
+        background-color: rgba(249, 249, 249, 0.8);
+      }
+    </style>
+  </head>
+  <body
+    onload="
+      (GetRequestsCurrantTechnicianOrEmployee(), loadStats(), loadCategories())
+    "
+    class="bg-background text-on-background font-body min-h-screen pb-20 md:pb-0 md:pt-16"
+  >
+    <!-- TopAppBar -->
+    <header
+      class="fixed top-0 z-50 flex items-center justify-between px-5 h-16 w-full bg-surface dark:bg-background border-b border-surface-container"
+    >
+      <div class="flex items-center gap-3">
+        <div
+          class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary"
+        >
+          <img src="Images/screen.png" />
+        </div>
+        <h1
+          class="font-headline text-2xl font-bold text-primary dark:text-primary-fixed"
+        >
+          MRS
+        </h1>
+      </div>
+      <!-- Desktop Nav Cluster -->
+      <nav class="hidden md:flex items-center gap-8">
+        <a
+          class="text-primary dark:text-primary-fixed font-semibold hover:bg-surface-container-low transition-colors px-3 py-2 rounded-lg"
+          href="#"
+          >Home</a
+        >
+        <a
+          class="text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-low transition-colors px-3 py-2 rounded-lg"
+          href="#"
+          >Requests</a
+        >
+        <a
+          class="text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-low transition-colors px-3 py-2 rounded-lg"
+          href="#"
+          >Reports</a
+        >
+        <a
+          class="text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-low transition-colors px-3 py-2 rounded-lg"
+          href="#"
+          >Settings</a
+        >
+      </nav>
+      <div class="flex items-center gap-4">
+        <button
+          class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-colors"
+        >
+          notifications
+        </button>
+        <div
+          class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant"
+        >
+          <img
+            alt="Medical Business Logo"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCG_ud4Hl_9Dt_QUWRfWl27pNwYry4wniEyAvDH9aBMDL290CSZDBOApu_nLQOk07OpqpLGFJxTgfxvjfVANUhugwuxHxP7XztVx0JlZkv4pWp3A5aZWiU4oFrGycZn9JFj4eEBk7ijOOTXiH91kqMGml4tnpcRASq64MsHKgRxhXPiNo4R7N9HF9_qEZ0ePEOOKm72m7pdSC6abRWX2H03n4PLgQLbBzgWvUa0OUIbfzjdBHUYAT0SmEXu4CaF6E3gB6aAv3n6bpg"
+          />
+        </div>
+      </div>
+    </header>
+    <!-- Main Content Canvas -->
+    <main class="max-w-7xl mx-auto px-5 py-8 md:py-12">
+      <!-- Header Section with Stats -->
+      <div class="mb-10">
+        <div
+          class="flex flex-col md:flex-row md:items-end justify-between gap-6"
+        >
+          <div>
+            <h2
+              class="font-headline text-3xl font-bold text-on-surface tracking-tight"
+            >
+              Service Requests
+            </h2>
+            <p class="text-on-surface-variant mt-1">
+              Manage and track technician assignments for patient care.
+            </p>
+          </div>
+          <button
+            onclick="openModal()"
+            class="flex items-center gap-2 bg-primary text-on-primary px-6 py-3 rounded-xl font-semibold shadow-lg hover:scale-95 transition-all"
+          >
+            <span class="material-symbols-outlined">add</span>
+            Add New Request
+          </button>
+        </div>
+      </div>
+      <!-- Quick Stats Bento Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <!-- Total Requests -->
+        <div
+          class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-blue-900 flex flex-col justify-between h-32"
+        >
+          <div class="text-on-surface-variant text-sm font-medium">
+            Total Requests
+          </div>
+          <div
+            id="Total"
+            class="text-4xl font-bold text-on-surface text-center"
+          >
+            0
+          </div>
+        </div>
+        <!-- New -->
+        <div
+          class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-sky-400 flex flex-col justify-between h-32"
+        >
+          <div class="text-on-surface-variant text-sm font-medium">New</div>
+          <div id="New" class="text-4xl font-bold text-on-surface text-center">
+            0
+          </div>
+        </div>
+        <!-- In Progress -->
+        <div
+          class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-orange-400 flex flex-col justify-between h-32"
+        >
+          <div class="text-on-surface-variant text-sm font-medium">
+            In Progress
+          </div>
+          <div
+            id="Progress"
+            class="text-4xl font-bold text-on-surface text-center"
+          >
+            0
+          </div>
+        </div>
+        <!-- Done -->
+        <div
+          class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-emerald-500 flex flex-col justify-between h-32"
+        >
+          <div class="text-on-surface-variant text-sm font-medium">Done</div>
+          <div id="Done" class="text-4xl font-bold text-on-surface text-center">
+            0
+          </div>
+        </div>
+      </div>
+      <!-- Filters and Search -->
+      <div
+        class="bg-surface-container-lowest p-4 rounded-t-card border-x border-t border-surface-container flex flex-col md:flex-row gap-4 justify-between items-center"
+      >
+        <div class="relative w-full md:w-96">
+          <span
+            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline"
+            >search</span
+          >
+          <input
+            class="w-full pl-10 pr-4 py-2.5 bg-surface-container-low border-none rounded-xl focus:ring-2 focus:ring-primary/20 text-on-surface placeholder:text-outline transition-all"
+            placeholder="Search in requests..."
+            type="text"
+          />
+        </div>
+        <div class="flex items-center gap-3 w-full md:w-auto">
+          <div class="relative w-full md:w-48">
+            <select
+              class="w-full appearance-none pl-4 pr-10 py-2.5 bg-surface-container-low border-none rounded-xl focus:ring-2 focus:ring-primary/20 text-on-surface font-medium cursor-pointer"
+            >
+              <option>All Statuses</option>
+              <option>Pending</option>
+              <option>In Progress</option>
+              <option>Completed</option>
+              <option>Rejected</option>
+            </select>
+            <span
+              class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-outline"
+              >expand_more</span
+            >
+          </div>
+          <button
+            class="bg-surface-container-low p-2.5 rounded-xl hover:bg-surface-container transition-colors"
+          >
+            <span class="material-symbols-outlined text-on-surface-variant"
+              >tune</span
+            >
+          </button>
+        </div>
+      </div>
+      <!-- Table Card -->
+      <div
+        class="bg-surface-container-lowest rounded-b-card diffused-shadow border border-surface-container overflow-hidden"
+      >
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr
+                class="bg-surface-container-low border-b border-surface-container"
+              >
+                <th
+                  class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest"
+                >
+                  ID
+                </th>
+                <th
+                  class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest"
+                >
+                  Request Title
+                </th>
+                <th
+                  class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest"
+                >
+                  Category
+                </th>
+                <th
+                  class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest"
+                >
+                  Status
+                </th>
+                <th
+                  class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest"
+                >
+                  Technician
+                </th>
+                <th
+                  class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest text-center"
+                >
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody id="body" class="divide-y divide-surface-container"></tbody>
+          </table>
+        </div>
+        <!-- Pagination -->
+        <div
+          class="px-6 py-4 bg-surface-container-low flex flex-col md:flex-row justify-between items-center gap-4"
+        >
+          <p class="text-sm text-on-surface-variant font-medium">
+            Showing 1 to 5 of 42 entries
+          </p>
+          <div class="flex items-center gap-2">
+            <button
+              class="w-10 h-10 rounded-xl flex items-center justify-center border border-outline-variant hover:bg-surface-container transition-colors disabled:opacity-30"
+              disabled=""
+            >
+              <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+            <button
+              class="w-10 h-10 rounded-xl flex items-center justify-center bg-primary text-on-primary font-bold shadow-md"
+            >
+              1
+            </button>
+            <button
+              class="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-surface-container transition-colors font-semibold"
+            >
+              2
+            </button>
+            <button
+              class="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-surface-container transition-colors font-semibold"
+            >
+              3
+            </button>
+            <button
+              class="w-10 h-10 rounded-xl flex items-center justify-center border border-outline-variant hover:bg-surface-container transition-colors"
+            >
+              <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+    <!-- BottomNavBar (Mobile Only) -->
+    <nav
+      class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-surface-container-lowest dark:bg-inverse-surface shadow-[0px_-10px_30px_rgba(10,27,51,0.05)] rounded-t-xl"
+    >
+      <a
+        class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary-fixed-dim text-on-secondary-container dark:text-on-secondary-fixed rounded-full px-5 py-1 transition-transform active:scale-90"
+        href="#"
+      >
+        <span
+          class="material-symbols-outlined"
+          style="font-variation-settings: &quot;FILL&quot; 1"
+          >home</span
+        >
+        <span class="text-[10px] font-bold uppercase tracking-wider mt-0.5"
+          >Home</span
+        >
+      </a>
+      <a
+        class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-fixed-variant hover:text-primary transition-colors active:scale-90"
+        href="#"
+      >
+        <span class="material-symbols-outlined">pending_actions</span>
+        <span class="text-[10px] font-bold uppercase tracking-wider mt-0.5"
+          >Requests</span
+        >
+      </a>
+      <a
+        class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-fixed-variant hover:text-primary transition-colors active:scale-90"
+        href="#"
+      >
+        <span class="material-symbols-outlined">analytics</span>
+        <span class="text-[10px] font-bold uppercase tracking-wider mt-0.5"
+          >Reports</span
+        >
+      </a>
+      <a
+        class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-fixed-variant hover:text-primary transition-colors active:scale-90"
+        href="#"
+      >
+        <span class="material-symbols-outlined">settings</span>
+        <span class="text-[10px] font-bold uppercase tracking-wider mt-0.5"
+          >Settings</span
+        >
+      </a>
+    </nav>
+    <!-- FAB for Quick Request (Contextual to Dashboard) -->
+    <button
+      class="md:hidden fixed bottom-24 right-5 w-14 h-14 bg-primary text-on-primary rounded-full shadow-2xl flex items-center justify-center active:scale-95 transition-all z-40"
+    >
+      <span
+        class="material-symbols-outlined"
+        style="font-variation-settings: &quot;FILL&quot; 1"
+        >add</span
+      >
+    </button>
+    <div
+      id="requestModal"
+      class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50"
+    >
+      <div class="bg-white w-[500px] rounded-2xl p-6 shadow-2xl">
+        <div class="flex justify-between items-center mb-5">
+          <h2 class="text-2xl font-bold">Create Request</h2>
+
+          <button onclick="closeModal()">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <select id="categorySelect" class="w-full border p-3 rounded-xl">
+          <option disabled selected>Choose Category</option>
+        </select>
+        <br />
+        <br />
+
+        <form id="requestForm" class="space-y-4">
+          <input
+            type="text"
+            placeholder="Title"
+            class="w-full border p-3 rounded-xl"
+          />
+
+          <textarea
+            placeholder="Description"
+            class="w-full border p-3 rounded-xl h-28"
+          ></textarea>
+
+          <input
+            type="text"
+            placeholder="Location"
+            class="w-full border p-3 rounded-xl"
+          />
+          <input
+            type="text"
+            placeholder="EmployeeNotes"
+            class="w-full border p-3 rounded-xl"
+          />
+
+          <input type="file" class="w-full border p-3 rounded-xl" />
+
+          <button
+            type="submit"
+            class="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold"
+          >
+            Submit Request
+          </button>
+        </form>
+      </div>
+    </div>
+    <script src="mrs.js"></script>
+  </body>
+</html>
