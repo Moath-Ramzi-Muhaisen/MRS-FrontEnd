@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>MRS Admin Dashboard</title>
+    <title>MRS Employee Dashboard</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Manrope:wght@600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
@@ -170,7 +170,7 @@
             <h2
               class="font-headline text-3xl font-bold text-on-surface tracking-tight"
             >
-              Service Requests
+              Employee Dashboard
             </h2>
             <p class="text-on-surface-variant mt-1">
               Manage and track technician assignments for patient care.
@@ -252,26 +252,21 @@
         <div class="flex items-center gap-3 w-full md:w-auto">
           <div class="relative w-full md:w-48">
             <select
+              onchange="filterByStatus(this.value)"
               class="w-full appearance-none pl-4 pr-10 py-2.5 bg-surface-container-low border-none rounded-xl focus:ring-2 focus:ring-primary/20 text-on-surface font-medium cursor-pointer"
             >
               <option>All Statuses</option>
-              <option>Pending</option>
-              <option>In Progress</option>
-              <option>Completed</option>
-              <option>Rejected</option>
+              <option>New</option>
+              <option>Assigned</option>
+              <option>InProgress</option>
+              <option>Resolved</option>
+              <option>Done</option>
             </select>
             <span
               class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-outline"
               >expand_more</span
             >
           </div>
-          <button
-            class="bg-surface-container-low p-2.5 rounded-xl hover:bg-surface-container transition-colors"
-          >
-            <span class="material-symbols-outlined text-on-surface-variant"
-              >tune</span
-            >
-          </button>
         </div>
       </div>
       <!-- Table Card -->
@@ -402,7 +397,7 @@
         >
       </a>
     </nav>
-    <!-- FAB for Quick Request (Contextual to Dashboard) -->
+    <!--  Add New Request  -->
     <button
       class="md:hidden fixed bottom-24 right-5 w-14 h-14 bg-primary text-on-primary rounded-full shadow-2xl flex items-center justify-center active:scale-95 transition-all z-40"
     >
@@ -462,6 +457,258 @@
             Submit Request
           </button>
         </form>
+      </div>
+    </div>
+
+    <div
+      id="detailsModal"
+      class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm items-center justify-center z-50"
+    >
+      <div
+        class="bg-white w-[750px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl p-6"
+      >
+        <!-- Header -->
+        <div class="flex justify-between items-center border-b pb-4 mb-5">
+          <h2 class="text-2xl font-bold text-gray-800">Request Details</h2>
+
+          <button
+            onclick="closeDetails()"
+            class="hover:bg-gray-100 p-2 rounded-full transition"
+          >
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <!-- Content Grid -->
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div class="bg-gray-50 p-3 rounded-xl">
+            <p class="text-gray-400 text-xs">Title</p>
+            <p id="title" class="font-semibold text-gray-800"></p>
+          </div>
+
+          <div class="bg-gray-50 p-3 rounded-xl">
+            <p class="text-gray-400 text-xs">Status</p>
+            <p id="status" class="font-semibold"></p>
+          </div>
+
+          <div class="bg-gray-50 p-3 rounded-xl col-span-2">
+            <p class="text-gray-400 text-xs">Description</p>
+            <p id="description" class="font-semibold text-gray-800"></p>
+          </div>
+
+          <div class="bg-gray-50 p-3 rounded-xl">
+            <p class="text-gray-400 text-xs">Employee</p>
+            <p id="employee" class="font-semibold"></p>
+          </div>
+
+          <div class="bg-gray-50 p-3 rounded-xl">
+            <p class="text-gray-400 text-xs">Technician</p>
+            <p id="technician" class="font-semibold"></p>
+          </div>
+
+          <div class="bg-gray-50 p-3 rounded-xl">
+            <p class="text-gray-400 text-xs">Category</p>
+            <p id="category" class="font-semibold"></p>
+          </div>
+
+          <div class="bg-gray-50 p-3 rounded-xl">
+            <p class="text-gray-400 text-xs">Created At</p>
+            <p id="createdAt" class="font-semibold"></p>
+          </div>
+
+          <div class="bg-gray-50 p-3 rounded-xl col-span-2">
+            <p class="text-gray-400 text-xs">Location</p>
+            <p id="location" class="font-semibold"></p>
+          </div>
+
+          <div class="bg-gray-50 p-3 rounded-xl">
+            <p class="text-gray-400 text-xs">Employee Notes</p>
+            <p id="employeeNotes"></p>
+          </div>
+
+          <div class="bg-gray-50 p-3 rounded-xl">
+            <p class="text-gray-400 text-xs">Technician Notes</p>
+            <p id="technicianNotes"></p>
+          </div>
+        </div>
+
+        <!-- Image -->
+        <div class="mt-5">
+          <p class="text-xs text-gray-400 mb-2">Image</p>
+          <img
+            id="requestImage"
+            class="rounded-2xl w-full h-[300px] object-cover border shadow-sm"
+          />
+        </div>
+      </div>
+    </div>
+    <!-- Edit Request Modal -->
+    <div
+      id="editRequestModal"
+      class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50"
+    >
+      <div
+        class="bg-white w-[500px] max-h-[90vh] overflow-y-auto rounded-2xl p-6 shadow-2xl"
+      >
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-5">
+          <h2 class="text-2xl font-bold">Edit Request</h2>
+
+          <button onclick="closeEditModal()">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <!-- Form -->
+        <form id="editRequestForm" class="space-y-4">
+          <!-- Category -->
+          <div>
+            <label class="block mb-1 text-sm text-gray-500"> Category </label>
+
+            <select
+              id="editCategorySelect"
+              class="w-full border p-3 rounded-xl"
+            ></select>
+          </div>
+
+          <!-- Title -->
+          <div>
+            <label class="block mb-1 text-sm text-gray-500"> Title </label>
+
+            <input
+              id="editTitle"
+              type="text"
+              placeholder="Enter title"
+              class="w-full border p-3 rounded-xl"
+            />
+          </div>
+
+          <!-- Description -->
+          <div>
+            <label class="block mb-1 text-sm text-gray-500">
+              Description
+            </label>
+
+            <textarea
+              id="editDescription"
+              placeholder="Enter description"
+              class="w-full border p-3 rounded-xl h-28"
+            ></textarea>
+          </div>
+
+          <!-- Location -->
+          <div>
+            <label class="block mb-1 text-sm text-gray-500"> Location </label>
+
+            <input
+              id="editLocation"
+              type="text"
+              placeholder="Enter location"
+              class="w-full border p-3 rounded-xl"
+            />
+          </div>
+
+          <!-- Employee Notes -->
+          <div>
+            <label class="block mb-1 text-sm text-gray-500">
+              Employee Notes
+            </label>
+
+            <input
+              id="editEmployeeNotes"
+              type="text"
+              placeholder="Enter notes"
+              class="w-full border p-3 rounded-xl"
+            />
+          </div>
+
+          <!-- Image -->
+          <div>
+            <label class="block mb-1 text-sm text-gray-500">
+              Upload Image
+            </label>
+
+            <input
+              id="editImage"
+              type="file"
+              class="w-full border p-3 rounded-xl"
+            />
+          </div>
+
+          <!-- Submit -->
+          <button
+            type="submit"
+            class="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
+          >
+            Update Request
+          </button>
+        </form>
+      </div>
+    </div>
+    <!-- Delete Confirmation Modal -->
+    <div
+      id="deleteModal"
+      class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50"
+    >
+      <div class="bg-white w-[400px] rounded-2xl p-6 shadow-2xl">
+        <!-- Icon -->
+        <div class="flex justify-center mb-4">
+          <div
+            class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center"
+          >
+            <span class="material-symbols-outlined text-red-600 text-4xl">
+              delete
+            </span>
+          </div>
+        </div>
+
+        <!-- Title -->
+        <h2 class="text-xl font-bold text-center mb-2">Delete Request</h2>
+
+        <!-- Message -->
+        <p class="text-sm text-gray-500 text-center mb-6">
+          Are you sure you want to delete this request?
+        </p>
+
+        <!-- Buttons -->
+        <div class="flex gap-3">
+          <!-- Cancel -->
+          <button
+            onclick="closeDeleteModal()"
+            class="flex-1 border border-gray-300 py-3 rounded-xl text-gray-700 hover:bg-gray-100 transition"
+          >
+            Cancel
+          </button>
+
+          <!-- Yes -->
+          <button
+            onclick="confirmDelete()"
+            class="flex-1 bg-red-600 text-white py-3 rounded-xl hover:bg-red-700 transition"
+          >
+            Yes, Delete
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- History Modal -->
+    <div
+      id="historyModal"
+      class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50"
+    >
+      <div
+        class="bg-white w-[700px] max-h-[90vh] overflow-y-auto rounded-2xl p-6 shadow-2xl"
+      >
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold">Request History</h2>
+
+          <button onclick="closeHistoryModal()">
+            <span class="material-symbols-outlined"> close </span>
+          </button>
+        </div>
+
+        <!-- History Container -->
+        <div id="historyContainer" class="space-y-4"></div>
       </div>
     </div>
     <script src="mrs.js"></script>

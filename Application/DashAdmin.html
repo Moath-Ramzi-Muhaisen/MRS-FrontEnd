@@ -1,0 +1,953 @@
+<!doctype html>
+
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>MRS Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Manrope:wght@600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              error: "#ba1a1a",
+              "surface-container-high": "#e8e8e8",
+              "inverse-surface": "#2f3131",
+              "on-primary-fixed-variant": "#004493",
+              "on-primary-fixed": "#001a41",
+              "inverse-primary": "#adc6ff",
+              "outline-variant": "#c1c6d7",
+              "on-tertiary": "#ffffff",
+              "on-secondary": "#ffffff",
+              "on-secondary-container": "#52617d",
+              "on-secondary-fixed": "#0b1c34",
+              "tertiary-fixed-dim": "#c0c7cf",
+              "surface-container-lowest": "#ffffff",
+              "on-surface-variant": "#414755",
+              "on-surface": "#1a1c1c",
+              "secondary-fixed-dim": "#b7c7e7",
+              surface: "#f9f9f9",
+              outline: "#717786",
+              "primary-fixed": "#d8e2ff",
+              "on-error-container": "#93000a",
+              "surface-variant": "#e2e2e2",
+              "error-container": "#ffdad6",
+              secondary: "#505f7a",
+              "surface-container-low": "#f3f3f4",
+              "secondary-container": "#ceddfe",
+              "surface-container": "#eeeeee",
+              "surface-container-highest": "#e2e2e2",
+              "primary-fixed-dim": "#adc6ff",
+              primary: "#0058bc",
+              "on-tertiary-container": "#fcfcff",
+              "on-primary": "#ffffff",
+              "on-background": "#1a1c1c",
+              "on-secondary-fixed-variant": "#384761",
+              tertiary: "#555d63",
+              "on-primary-container": "#fefcff",
+              "tertiary-fixed": "#dce3eb",
+              "on-tertiary-fixed": "#151c22",
+              "primary-container": "#0070eb",
+              "on-error": "#ffffff",
+              "surface-dim": "#dadada",
+              background: "#f9f9f9",
+              "surface-bright": "#f9f9f9",
+              "secondary-fixed": "#d6e3ff",
+              "on-tertiary-fixed-variant": "#40484e",
+              "tertiary-container": "#6e757c",
+              "inverse-on-surface": "#f0f1f1",
+              "surface-tint": "#005bc1",
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              card: "20px",
+              full: "9999px",
+            },
+            fontFamily: {
+              headline: ["Manrope", "sans-serif"],
+              display: ["Manrope", "sans-serif"],
+              body: ["Inter", "sans-serif"],
+              label: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      .diffused-shadow {
+        box-shadow: 0px 10px 30px rgba(10, 27, 51, 0.05);
+      }
+      .glass-header {
+        backdrop-filter: blur(8px);
+        background-color: rgba(249, 249, 249, 0.8);
+      }
+
+      /* Simple tab switching logic using CSS */
+      .tab-content {
+        display: none;
+      }
+      #tab1:checked ~ .tab-contents .tab1-content,
+      #tab2:checked ~ .tab-contents .tab2-content,
+      #tab3:checked ~ .tab-contents .tab3-content {
+        display: block;
+      }
+
+      #tab1:checked ~ .tab-controls label[for="tab1"],
+      #tab2:checked ~ .tab-controls label[for="tab2"],
+      #tab3:checked ~ .tab-controls label[for="tab3"] {
+        background-color: var(--color-primary, #0058bc);
+        color: var(--color-on-primary, #ffffff);
+        font-weight: bold;
+        box-shadow:
+          0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      }
+    </style>
+  </head>
+  <body
+    onload="
+      (loadStatsAdmin(), GetAllRequests(), loadCategories(), GetAllEmployee())
+    "
+    class="bg-background text-on-background font-body min-h-screen pb-20 md:pb-0 md:pt-16"
+  >
+    <!-- TopAppBar -->
+    <header
+      class="fixed top-0 z-50 flex items-center justify-between px-5 h-16 w-full bg-surface dark:bg-background border-b border-surface-container"
+    >
+      <div class="flex items-center gap-3">
+        <div
+          class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary"
+        >
+          <img src="Images/screen.png" />
+        </div>
+        <h1
+          class="font-headline text-2xl font-bold text-primary dark:text-primary-fixed"
+        >
+          MRS
+        </h1>
+      </div>
+      <!-- Desktop Nav Cluster -->
+      <nav class="hidden md:flex items-center gap-8">
+        <a
+          id="RequestsBtn"
+          class="cursor-pointer text-primary font-semibold px-3 py-2 rounded-lg"
+        >
+          Requests
+        </a>
+
+        <a
+          id="EmployeeBtn"
+          class="cursor-pointer text-on-surface-variant px-3 py-2 rounded-lg"
+        >
+          Employee
+        </a>
+
+        <a
+          id="TechnicianBtn"
+          class="cursor-pointer text-on-surface-variant px-3 py-2 rounded-lg"
+        >
+          Technician
+        </a>
+      </nav>
+      <div class="flex items-center gap-4">
+        <button
+          class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-colors"
+        >
+          notifications
+        </button>
+        <div
+          class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant"
+        >
+          <img
+            alt="Medical Business Logo"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCG_ud4Hl_9Dt_QUWRfWl27pNwYry4wniEyAvDH9aBMDL290CSZDBOApu_nLQOk07OpqpLGFJxTgfxvjfVANUhugwuxHxP7XztVx0JlZkv4pWp3A5aZWiU4oFrGycZn9JFj4eEBk7ijOOTXiH91kqMGml4tnpcRASq64MsHKgRxhXPiNo4R7N9HF9_qEZ0ePEOOKm72m7pdSC6abRWX2H03n4PLgQLbBzgWvUa0OUIbfzjdBHUYAT0SmEXu4CaF6E3gB6aAv3n6bpg"
+          />
+        </div>
+      </div>
+    </header>
+    <!-- Main Content Canvas -->
+    <main class="max-w-7xl mx-auto px-5 py-8 md:py-12">
+      <!-- Header Section with Stats -->
+      <div class="mb-10">
+        <div
+          class="flex flex-col md:flex-row md:items-end justify-between gap-6"
+        >
+          <div>
+            <h2
+              class="font-headline text-3xl font-bold text-on-surface tracking-tight"
+            >
+              Admin Dashboard
+            </h2>
+            <p class="text-on-surface-variant mt-1">
+              Manage system requests, users, and technicians.
+            </p>
+          </div>
+        </div>
+      </div>
+      <!-- Quick Stats Bento Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <!-- Total Requests -->
+        <div
+          class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-blue-500 flex flex-col justify-between h-32"
+        >
+          <div class="text-on-surface-variant text-sm font-medium">
+            Total Requests
+          </div>
+          <div
+            id="TotalAdmin"
+            class="text-4xl font-bold text-on-surface text-center"
+          >
+            0
+          </div>
+        </div>
+        <!-- New -->
+        <div
+          class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-sky-400 flex flex-col justify-between h-32"
+        >
+          <div class="text-on-surface-variant text-sm font-medium">New</div>
+          <div
+            id="NewAdmin"
+            class="text-4xl font-bold text-on-surface text-center"
+          >
+            0
+          </div>
+        </div>
+
+        <!-- In Progress -->
+        <div
+          class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-orange-400 flex flex-col justify-between h-32"
+        >
+          <div class="text-on-surface-variant text-sm font-medium">
+            In Progress
+          </div>
+          <div
+            id="ProgressAdmin"
+            class="text-4xl font-bold text-on-surface text-center"
+          >
+            0
+          </div>
+        </div>
+        <!-- Done -->
+        <div
+          class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-emerald-500 flex flex-col justify-between h-32"
+        >
+          <div class="text-on-surface-variant text-sm font-medium">Done</div>
+          <div
+            id="DoneAdmin"
+            class="text-4xl font-bold text-on-surface text-center"
+          >
+            0
+          </div>
+        </div>
+      </div>
+      <!-- Hidden Radio Buttons for Tab State -->
+      <input
+        checked=""
+        class="hidden"
+        id="tab1"
+        name="dashboard-tabs"
+        type="radio"
+      />
+      <input class="hidden" id="tab2" name="dashboard-tabs" type="radio" />
+      <input class="hidden" id="tab3" name="dashboard-tabs" type="radio" />
+      <!-- Tab Contents Wrapper -->
+      <div class="tab-contents">
+        <!-- Tab 1 Content: Requests -->
+        <div class="tab-content tab1-content">
+          <!-- Filters and Search -->
+          <div
+            class="bg-surface-container-lowest p-4 rounded-t-card border-x border-t border-surface-container flex flex-col md:flex-row gap-4 justify-between items-center"
+          >
+            <div class="relative w-full md:w-96">
+              <span
+                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline"
+                >search</span
+              >
+              <input
+                class="w-full pl-10 pr-4 py-2.5 bg-surface-container-low border-none rounded-xl focus:ring-2 focus:ring-primary/20 text-on-surface placeholder:text-outline transition-all"
+                placeholder="Search in requests..."
+                type="text"
+              />
+            </div>
+            <div class="flex items-center gap-3 w-full md:w-auto">
+              <div class="relative w-full md:w-48">
+                <select
+                  onchange="filterByStatus(this.value)"
+                  class="w-full appearance-none pl-4 pr-10 py-2.5 bg-surface-container-low border-none rounded-xl focus:ring-2 focus:ring-primary/20 text-on-surface font-medium cursor-pointer"
+                >
+                  <option>All Statuses</option>
+                  <option>New</option>
+                  <option>Assigned</option>
+                  <option>InProgress</option>
+                  <option>Resolved</option>
+                  <option>Done</option>
+                </select>
+                <span
+                  class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-outline"
+                  >expand_more</span
+                >
+              </div>
+              <button
+                class="bg-surface-container-low p-2.5 rounded-xl hover:bg-surface-container transition-colors"
+              >
+                <span class="material-symbols-outlined text-on-surface-variant"
+                  >tune</span
+                >
+              </button>
+            </div>
+          </div>
+          <!-- Table Card -->
+          <div
+            class="bg-surface-container-lowest rounded-b-card diffused-shadow border border-surface-container overflow-hidden"
+          >
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr
+                    class="bg-surface-container-low border-b border-surface-container"
+                  >
+                    <th
+                      class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest"
+                    >
+                      ID
+                    </th>
+                    <th
+                      class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest"
+                    >
+                      Request Title
+                    </th>
+                    <th
+                      class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest"
+                    >
+                      Category
+                    </th>
+                    <th
+                      class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest"
+                    >
+                      Status
+                    </th>
+                    <th
+                      class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest"
+                    >
+                      Technician
+                    </th>
+                    <th
+                      class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest text-center"
+                    >
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody
+                  id="bodyAdmin"
+                  class="divide-y divide-surface-container"
+                ></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- End Tab 1 Content -->
+        <!-- Tab 2 Content: Users -->
+        <div class="tab-content tab2-content">
+          <!-- Filters and Search -->
+          <div
+            class="bg-surface-container-lowest p-4 rounded-t-card border-x border-t border-surface-container flex flex-col md:flex-row gap-4 justify-between items-center"
+          >
+            <div class="relative w-full md:w-96">
+              <span
+                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline"
+                >search</span
+              >
+              <input
+                class="w-full pl-10 pr-4 py-2.5 bg-surface-container-low border-none rounded-xl focus:ring-2 focus:ring-primary/20 text-on-surface placeholder:text-outline transition-all"
+                placeholder="Search in users..."
+                type="text"
+              />
+            </div>
+          </div>
+          <!-- Table Card -->
+          <div
+            class="bg-surface-container-lowest rounded-b-card diffused-shadow border border-surface-container overflow-hidden"
+          >
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr
+                    class="bg-surface-container-low border-b border-surface-container"
+                  >
+                    <th
+                      class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest"
+                    >
+                      ID
+                    </th>
+                    <th
+                      class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest"
+                    >
+                      Name
+                    </th>
+                    <th
+                      class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest"
+                    >
+                      Email
+                    </th>
+                    <th
+                      class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest"
+                    >
+                      Phone Number
+                    </th>
+                    <th
+                      class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest"
+                    >
+                      Location
+                    </th>
+                    <th
+                      class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest text-center"
+                    >
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody
+                  id="tableUser"
+                  class="divide-y divide-surface-container"
+                ></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- End Tab 2 Content -->
+        <!-- Tab 3 Content: Technicians -->
+        <div class="tab-content tab3-content">
+          <!-- Filters and Search -->
+          <div
+            class="bg-surface-container-lowest p-4 rounded-t-card border-x border-t border-surface-container flex flex-col md:flex-row gap-4 justify-between items-center"
+          >
+            <div class="relative w-full md:w-96">
+              <span
+                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline"
+                >search</span
+              >
+              <input
+                class="w-full pl-10 pr-4 py-2.5 bg-surface-container-low border-none rounded-xl focus:ring-2 focus:ring-primary/20 text-on-surface placeholder:text-outline transition-all"
+                placeholder="Search in technicians..."
+                type="text"
+              />
+            </div>
+          </div>
+          <!-- Table Card -->
+          <div
+            class="bg-surface-container-lowest rounded-b-card diffused-shadow border border-surface-container overflow-hidden"
+          >
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr
+                    class="bg-surface-container-low border-b border-surface-container"
+                  >
+                    <th
+                      class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest"
+                    >
+                      ID
+                    </th>
+                    <th
+                      class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest"
+                    >
+                      Name
+                    </th>
+                    <th
+                      class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest"
+                    >
+                      Email
+                    </th>
+                    <th
+                      class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest"
+                    >
+                      Phone Number
+                    </th>
+                    <th
+                      class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest"
+                    >
+                      Location
+                    </th>
+                    <th
+                      class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest"
+                    >
+                      Category
+                    </th>
+                    <th
+                      class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest text-center"
+                    >
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-surface-container">
+                  <tr
+                    class="hover:bg-surface-container-low transition-colors group"
+                  >
+                    <td class="px-6 py-5 font-medium text-on-surface">
+                      TECH-001
+                    </td>
+                    <td class="px-6 py-5 font-semibold text-on-surface">
+                      Erik Miller
+                    </td>
+                    <td class="px-6 py-5 text-on-surface-variant">
+                      emiller@tech.org
+                    </td>
+                    <td class="px-6 py-5 text-on-surface-variant">555-0201</td>
+                    <td class="px-6 py-5 text-on-surface">Basement Workshop</td>
+                    <td class="px-6 py-5 text-on-surface">
+                      Biomedical Maintenance
+                    </td>
+                    <td class="px-6 py-5">
+                      <div class="flex items-center justify-center gap-2">
+                        <button
+                          class="p-1.5 hover:bg-surface-container rounded-lg text-primary transition-colors"
+                          title="Edit"
+                        >
+                          <span class="material-symbols-outlined text-[20px]"
+                            >edit</span
+                          >
+                        </button>
+                        <button
+                          class="p-1.5 hover:bg-error-container rounded-lg text-error transition-colors"
+                          title="Delete"
+                        >
+                          <span class="material-symbols-outlined text-[20px]"
+                            >delete</span
+                          >
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr
+                    class="hover:bg-surface-container-low transition-colors group"
+                  >
+                    <td class="px-6 py-5 font-medium text-on-surface">
+                      TECH-002
+                    </td>
+                    <td class="px-6 py-5 font-semibold text-on-surface">
+                      Marcus Chen
+                    </td>
+                    <td class="px-6 py-5 text-on-surface-variant">
+                      mchen@tech.org
+                    </td>
+                    <td class="px-6 py-5 text-on-surface-variant">555-0202</td>
+                    <td class="px-6 py-5 text-on-surface">
+                      IT Dept. 3rd Floor
+                    </td>
+                    <td class="px-6 py-5 text-on-surface">IT Support</td>
+                    <td class="px-6 py-5">
+                      <div class="flex items-center justify-center gap-2">
+                        <button
+                          class="p-1.5 hover:bg-surface-container rounded-lg text-primary transition-colors"
+                          title="Edit"
+                        >
+                          <span class="material-symbols-outlined text-[20px]"
+                            >edit</span
+                          >
+                        </button>
+                        <button
+                          class="p-1.5 hover:bg-error-container rounded-lg text-error transition-colors"
+                          title="Delete"
+                        >
+                          <span class="material-symbols-outlined text-[20px]"
+                            >delete</span
+                          >
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- End Tab 3 Content -->
+      </div>
+      <!-- End Tab Contents Wrapper -->
+      <!-- Pagination / Tab Controls -->
+      <div
+        class="tab-controls px-6 py-4 bg-surface-container-low flex flex-col md:flex-row justify-between items-center gap-4 mt-4 rounded-xl border border-surface-container"
+      >
+        <p class="text-sm text-on-surface-variant font-medium">
+          Select view: 1 = Requests, 2 = Users, 3 = Technicians
+        </p>
+        <div class="flex items-center gap-2">
+          <label
+            class="w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer hover:bg-surface-container transition-colors font-semibold text-on-surface-variant border border-outline-variant"
+            for="tab1"
+            >1</label
+          >
+          <label
+            class="w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer hover:bg-surface-container transition-colors font-semibold text-on-surface-variant border border-outline-variant"
+            for="tab2"
+            >2</label
+          >
+          <label
+            class="w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer hover:bg-surface-container transition-colors font-semibold text-on-surface-variant border border-outline-variant"
+            for="tab3"
+            >3</label
+          >
+        </div>
+      </div>
+    </main>
+    <!-- BottomNavBar (Mobile Only) -->
+    <nav
+      class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-surface-container-lowest dark:bg-inverse-surface shadow-[0px_-10px_30px_rgba(10,27,51,0.05)] rounded-t-xl"
+    >
+      <a
+        class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary-fixed-dim text-on-secondary-container dark:text-on-secondary-fixed rounded-full px-5 py-1 transition-transform active:scale-90"
+        href="#"
+      >
+        <span
+          class="material-symbols-outlined"
+          style="font-variation-settings: &quot;FILL&quot; 1"
+          >home</span
+        >
+        <span class="text-[10px] font-bold uppercase tracking-wider mt-0.5"
+          >Home</span
+        >
+      </a>
+      <a
+        class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-fixed-variant hover:text-primary transition-colors active:scale-90"
+        href="#"
+      >
+        <span class="material-symbols-outlined">pending_actions</span>
+        <span class="text-[10px] font-bold uppercase tracking-wider mt-0.5"
+          >Requests</span
+        >
+      </a>
+      <a
+        class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-fixed-variant hover:text-primary transition-colors active:scale-90"
+        href="#"
+      >
+        <span class="material-symbols-outlined">analytics</span>
+        <span class="text-[10px] font-bold uppercase tracking-wider mt-0.5"
+          >Reports</span
+        >
+      </a>
+      <a
+        class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-fixed-variant hover:text-primary transition-colors active:scale-90"
+        href="#"
+      >
+        <span class="material-symbols-outlined">settings</span>
+        <span class="text-[10px] font-bold uppercase tracking-wider mt-0.5"
+          >Settings</span
+        >
+      </a>
+    </nav>
+    <div
+      id="detailsModal"
+      class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm items-center justify-center z-50"
+    >
+      <div
+        class="bg-white w-[750px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl p-6"
+      >
+        <!-- Header -->
+        <div class="flex justify-between items-center border-b pb-4 mb-5">
+          <h2 class="text-2xl font-bold text-gray-800">Request Details</h2>
+
+          <button
+            onclick="closeDetails()"
+            class="hover:bg-gray-100 p-2 rounded-full transition"
+          >
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <!-- Content Grid -->
+        <div class="grid grid-cols-2 gap-4 text-sm">
+          <div class="bg-gray-50 p-3 rounded-xl">
+            <p class="text-gray-400 text-xs">Title</p>
+            <p id="title" class="font-semibold text-gray-800"></p>
+          </div>
+
+          <div class="bg-gray-50 p-3 rounded-xl">
+            <p class="text-gray-400 text-xs">Status</p>
+            <p id="status" class="font-semibold"></p>
+          </div>
+
+          <div class="bg-gray-50 p-3 rounded-xl col-span-2">
+            <p class="text-gray-400 text-xs">Description</p>
+            <p id="description" class="font-semibold text-gray-800"></p>
+          </div>
+
+          <div class="bg-gray-50 p-3 rounded-xl">
+            <p class="text-gray-400 text-xs">Employee</p>
+            <p id="employee" class="font-semibold"></p>
+          </div>
+
+          <div class="bg-gray-50 p-3 rounded-xl">
+            <p class="text-gray-400 text-xs">Technician</p>
+            <p id="technician" class="font-semibold"></p>
+          </div>
+
+          <div class="bg-gray-50 p-3 rounded-xl">
+            <p class="text-gray-400 text-xs">Category</p>
+            <p id="category" class="font-semibold"></p>
+          </div>
+
+          <div class="bg-gray-50 p-3 rounded-xl">
+            <p class="text-gray-400 text-xs">Created At</p>
+            <p id="createdAt" class="font-semibold"></p>
+          </div>
+
+          <div class="bg-gray-50 p-3 rounded-xl col-span-2">
+            <p class="text-gray-400 text-xs">Location</p>
+            <p id="location" class="font-semibold"></p>
+          </div>
+
+          <div class="bg-gray-50 p-3 rounded-xl">
+            <p class="text-gray-400 text-xs">Employee Notes</p>
+            <p id="employeeNotes"></p>
+          </div>
+
+          <div class="bg-gray-50 p-3 rounded-xl">
+            <p class="text-gray-400 text-xs">Technician Notes</p>
+            <p id="technicianNotes"></p>
+          </div>
+        </div>
+
+        <!-- Image -->
+        <div class="mt-5">
+          <p class="text-xs text-gray-400 mb-2">Image</p>
+          <img
+            id="requestImage"
+            class="rounded-2xl w-full h-[300px] object-cover border shadow-sm"
+          />
+        </div>
+      </div>
+    </div>
+    <!-- Edit Request Modal -->
+    <div
+      id="editRequestModal"
+      class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50"
+    >
+      <div
+        class="bg-white w-[500px] max-h-[90vh] overflow-y-auto rounded-2xl p-6 shadow-2xl"
+      >
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-5">
+          <h2 class="text-2xl font-bold">Edit Request</h2>
+
+          <button onclick="closeEditModal()">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <!-- Form -->
+        <form id="editRequestForm" class="space-y-4">
+          <!-- Category -->
+          <div>
+            <label class="block mb-1 text-sm text-gray-500"> Category </label>
+
+            <select
+              id="editCategorySelectAdmin"
+              class="w-full border p-3 rounded-xl"
+            ></select>
+          </div>
+
+          <!-- Title -->
+          <div>
+            <label class="block mb-1 text-sm text-gray-500"> Title </label>
+
+            <input
+              id="editTitle"
+              type="text"
+              placeholder="Enter title"
+              class="w-full border p-3 rounded-xl"
+            />
+          </div>
+
+          <!-- Description -->
+          <div>
+            <label class="block mb-1 text-sm text-gray-500">
+              Description
+            </label>
+
+            <textarea
+              id="editDescription"
+              placeholder="Enter description"
+              class="w-full border p-3 rounded-xl h-28"
+            ></textarea>
+          </div>
+
+          <!-- Location -->
+          <div>
+            <label class="block mb-1 text-sm text-gray-500"> Location </label>
+
+            <input
+              id="editLocation"
+              type="text"
+              placeholder="Enter location"
+              class="w-full border p-3 rounded-xl"
+            />
+          </div>
+
+          <!-- Employee Notes -->
+          <div>
+            <label class="block mb-1 text-sm text-gray-500">
+              Employee Notes
+            </label>
+
+            <input
+              id="editEmployeeNotes"
+              type="text"
+              placeholder="Enter notes"
+              class="w-full border p-3 rounded-xl"
+            />
+          </div>
+
+          <!-- Image -->
+          <div>
+            <label class="block mb-1 text-sm text-gray-500">
+              Upload Image
+            </label>
+
+            <input
+              id="editImage"
+              type="file"
+              class="w-full border p-3 rounded-xl"
+            />
+          </div>
+
+          <!-- Submit -->
+          <button
+            type="submit"
+            class="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
+          >
+            Update Request
+          </button>
+        </form>
+      </div>
+    </div>
+    <!-- Delete Confirmation Modal -->
+    <div
+      id="deleteModalAdmin"
+      class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50"
+    >
+      <div class="bg-white w-[400px] rounded-2xl p-6 shadow-2xl">
+        <!-- Icon -->
+        <div class="flex justify-center mb-4">
+          <div
+            class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center"
+          >
+            <span class="material-symbols-outlined text-red-600 text-4xl">
+              delete
+            </span>
+          </div>
+        </div>
+
+        <!-- Title -->
+        <h2 class="text-xl font-bold text-center mb-2">Delete Request</h2>
+
+        <!-- Message -->
+        <p class="text-sm text-gray-500 text-center mb-6">
+          Are you sure you want to delete this request?
+        </p>
+
+        <!-- Buttons -->
+        <div class="flex gap-3">
+          <!-- Cancel -->
+          <button
+            onclick="closeDeleteModal()"
+            class="flex-1 border border-gray-300 py-3 rounded-xl text-gray-700 hover:bg-gray-100 transition"
+          >
+            Cancel
+          </button>
+
+          <!-- Yes -->
+          <button
+            onclick="confirmDelete()"
+            class="flex-1 bg-red-600 text-white py-3 rounded-xl hover:bg-red-700 transition"
+          >
+            Yes, Delete
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- Delete User Confirmation Modal -->
+    <div
+      id="deleteModalUser"
+      class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50"
+    >
+      <div class="bg-white w-[400px] rounded-2xl p-6 shadow-2xl">
+        <!-- Icon -->
+        <div class="flex justify-center mb-4">
+          <div
+            class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center"
+          >
+            <span class="material-symbols-outlined text-red-600 text-4xl">
+              delete
+            </span>
+          </div>
+        </div>
+
+        <!-- Title -->
+        <h2 class="text-xl font-bold text-center mb-2">Delete Employee</h2>
+
+        <!-- Message -->
+        <p class="text-sm text-gray-500 text-center mb-6">
+          Are you sure you want to delete this Employee?
+        </p>
+
+        <!-- Buttons -->
+        <div class="flex gap-3">
+          <!-- Cancel -->
+          <button
+            onclick="closeDeleteEmployeel()"
+            class="flex-1 border border-gray-300 py-3 rounded-xl text-gray-700 hover:bg-gray-100 transition"
+          >
+            Cancel
+          </button>
+
+          <!-- Yes -->
+          <button
+            onclick="confirmDeleteUser()"
+            class="flex-1 bg-red-600 text-white py-3 rounded-xl hover:bg-red-700 transition"
+          >
+            Yes, Delete
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- History Modal -->
+    <div
+      id="historyModal"
+      class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50"
+    >
+      <div
+        class="bg-white w-[700px] max-h-[90vh] overflow-y-auto rounded-2xl p-6 shadow-2xl"
+      >
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold">Request History</h2>
+
+          <button onclick="closeHistoryModal()">
+            <span class="material-symbols-outlined"> close </span>
+          </button>
+        </div>
+
+        <!-- History Container -->
+        <div id="historyContainer" class="space-y-4"></div>
+      </div>
+    </div>
+    <script src="mrs.js" defer></script>
+  </body>
+</html>
