@@ -2,51 +2,63 @@ let allRequests = [];
 let allEmployee = [];
 let deleteRequestId = null;
 let deleteUserId = null;
+let currentRequestId = null;
+let allTechnicians = [];
+let currentEmployeeId = null;
 
+// ─── Modal Helpers (Bootstrap version) ───────────────────────────────────────
+function showModal(id) {
+  const modal = document.getElementById(id);
+  if (modal) {
+    modal.style.display = "block";
+    modal.classList.add("show");
+  }
+}
+
+function hideModal(id) {
+  const modal = document.getElementById(id);
+  if (modal) {
+    modal.style.display = "none";
+    modal.classList.remove("show");
+  }
+}
+// في آخر renderTableTechnicians بعد الـ forEach
+document.querySelectorAll('[data-bs-toggle="popover"]').forEach((el) => {
+  new bootstrap.Popover(el);
+});
+
+// ─── Login ────────────────────────────────────────────────────────────────────
 async function Login() {
   let username = document.getElementById("email").value;
   let password = document.getElementById("password").value;
   try {
-    const response = await fetch("https://localhost:7128/api/Auth/Login", {
+    const response = await fetch("http://localhost:8080/api/Auth/Login", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: username,
-        password: password,
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
     });
 
-    if (!response.ok) {
-      return;
-    }
+    if (!response.ok) return;
 
     const data = await response.json();
+    localStorage.setItem("token", data.accessToken);
+    localStorage.setItem("role", data.roleName);
 
-    let token = data.accessToken;
-    let role = data.roleName;
-
-    localStorage.setItem("token", token);
-    localStorage.setItem("role", role);
-
-    if (role == "Admin") {
-      window.location.href = "DashAdmin.html";
-    } else if (role == "Employee") {
+    if (data.roleName === "Admin") window.location.href = "DashAdmin.html";
+    else if (data.roleName === "Employee")
       window.location.href = "DashEmployee.html";
-    } else {
-      window.location.href = "DashTechnician.html";
-    }
+    else window.location.href = "DashTechnician.html";
   } catch (error) {
     console.log("Error:", error);
   }
 }
+
+// ─── Fetch Requests ───────────────────────────────────────────────────────────
 async function GetRequestsCurrantTechnicianOrEmployee() {
   const token = localStorage.getItem("token");
-
   try {
     const response = await fetch(
-      "https://localhost:7128/api/Request/Get_Requests_Currant_Technician_Or_Employee",
+      "http://localhost:8080/api/Request/Get_Requests_Currant_Technician_Or_Employee",
       {
         method: "GET",
         headers: {
@@ -55,22 +67,19 @@ async function GetRequestsCurrantTechnicianOrEmployee() {
         },
       },
     );
-
     const data = await response.json();
-
-    allRequests = data; // 👈 حفظ البيانات
-
+    allRequests = data;
     renderTable(allRequests);
   } catch (error) {
     console.log(error);
   }
 }
+
 async function GetAllEmployee() {
   const token = localStorage.getItem("token");
-
   try {
     const response = await fetch(
-      "https://localhost:7128/api/User/Get_Users_Employees",
+      "http://localhost:8080/api/User/Get_Users_Employees",
       {
         method: "GET",
         headers: {
@@ -79,22 +88,18 @@ async function GetAllEmployee() {
         },
       },
     );
-
     const data = await response.json();
-
-    allEmployee = data; // 👈 حفظ البيانات
-
+    allEmployee = data;
     renderTableUser(allEmployee);
   } catch (error) {
     console.log(error);
   }
 }
-async function GetAllRequests() {
+async function GetAllTechnicians() {
   const token = localStorage.getItem("token");
-
   try {
     const response = await fetch(
-      "https://localhost:7128/api/Request/Get_All_Requests",
+      "http://localhost:8080/api/User/Get_Users_Technicians",
       {
         method: "GET",
         headers: {
@@ -103,145 +108,143 @@ async function GetAllRequests() {
         },
       },
     );
-
     const data = await response.json();
+    allTechnicians = data;
+    renderTableTechnicians(allTechnicians);
+  } catch (error) {
+    console.log(error);
+  }
+}
 
-    allRequests = data; // مهم للفلترة
-
+async function GetAllRequests() {
+  const token = localStorage.getItem("token");
+  try {
+    const response = await fetch(
+      "http://localhost:8080/api/Request/Get_All_Requests",
+      {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      },
+    );
+    const data = await response.json();
+    allRequests = data;
     renderTable(allRequests);
   } catch (error) {
     console.log(error);
   }
 }
+
+// ─── Render Table ─────────────────────────────────────────────────────────────
 function renderTable(data) {
   const role = localStorage.getItem("role");
-
-  let tbody;
-
-  if (role == "Admin") {
-    tbody = document.getElementById("bodyAdmin");
-  } else {
-    tbody = document.getElementById("body");
-  }
-
+  const tbody = document.getElementById(
+    role === "Admin" ? "bodyAdmin" : "body",
+  );
+  if (!tbody) return;
   tbody.innerHTML = "";
 
   data.forEach((element) => {
     const ui = getStatusUI(element.statusName);
 
     tbody.innerHTML += `
-      <tr class="hover:bg-surface-container-low transition-colors group">
+      <tr
+        style="transition: background 0.2s; cursor:default;"
+        onmouseover="this.style.backgroundColor='var(--surface-container-low)'"
+        onmouseout="this.style.backgroundColor=''"
+      >
+        <td style="padding:14px 24px; color:var(--on-surface); font-weight:500; vertical-align:middle;">
+        ${element.id}
+      </td>
 
-        <td class="px-6 py-5 font-medium text-on-surface">
-          ${element.id}
-        </td>
+        <td style="padding:14px 24px; vertical-align:middle;">
+          <div style="font-weight:600; color:var(--on-surface);">${element.title}</div>
+          <div style="font-size:0.8rem; color:var(--on-surface-variant); margin-top:2px;">${element.requestDetail.location}</div>
+      </td>
 
-        <td class="px-6 py-5">
-          <div class="font-semibold text-on-surface">
-            ${element.title}
-          </div>
-          <div class="text-sm text-on-surface-variant">
-            ${element.requestDetail.location}
-          </div>
-        </td>
+        <td style="padding:14px 24px; color:var(--on-surface); vertical-align:middle;">
+        ${element.categoryName}
+      </td>
 
-        <td class="px-6 py-5 text-on-surface">
-          ${element.categoryName}
-        </td>
+        <td style="padding:14px 24px; vertical-align:middle;">
+          <span class="status-badge ${ui.cls}"
+                onmouseover="this.style.transform='scale(1.07)'"
+              onmouseout="this.style.transform='scale(1)'">
+            <span class="material-symbols-outlined" style="font-size:16px; line-height:1;">${ui.icon}</span>
+          ${element.statusName}
+        </span>
+      </td>
 
-        <td class="px-6 py-5">
-          <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold ${ui.color} transition-all hover:scale-105 duration-200">
+        <td style="padding:14px 24px; vertical-align:middle;">
+          <span style="font-weight:500; color:var(--on-surface);">${element.technicianName}</span>
+      </td>
 
-            <span class="material-symbols-outlined text-[18px]">
-              ${ui.icon}
-            </span>
+        <td style="padding:14px 24px; vertical-align:middle;">
+          <div style="display:flex; align-items:center; justify-content:center; gap:6px;">
 
-            ${element.statusName}
+          <button
+              onclick="openDetails(); getDetails('${element.id}')"
+              class="action-btn primary-action"
+            title="Details"
+          >
+              <span class="material-symbols-outlined" style="font-size:19px;">visibility</span>
+          </button>
 
-          </span>
-        </td>
+          <button
+              onclick="openEditModal(); getDetails('${element.id}')"
+              class="action-btn primary-action"
+            title="Edit"
+          >
+              <span class="material-symbols-outlined" style="font-size:19px;">edit</span>
+          </button>
 
-        <td class="px-6 py-5">
-          <div class="flex items-center gap-3">
-            <span class="text-on-surface font-medium">
-              ${element.technicianName}
-            </span>
-          </div>
-        </td>
+          <button
+            onclick="openDeleteModal('${element.id}')"
+              class="action-btn danger-action"
+            title="Delete"
+          >
+              <span class="material-symbols-outlined" style="font-size:19px;">delete</span>
+          </button>
 
-        <td class="px-6 py-5">
-          <div class="flex items-center justify-center gap-2">
+          <button
+            onclick="openHistoryModal('${element.id}')"
+              class="action-btn ghost-action"
+            title="History"
+          >
+              <span class="material-symbols-outlined" style="font-size:19px;">history</span>
+          </button>
 
-            <button
-              onclick="openDetails(),getDetails('${element.id}')"
-              class="p-1.5 hover:bg-surface-container rounded-lg text-primary transition-colors"
-              title="Details"
-            >
-              <span class="material-symbols-outlined text-[20px]">visibility</span>
-            </button>
-
-            <button
-              onclick="openEditModal(),getDetails('${element.id}')"
-              class="p-1.5 hover:bg-surface-container rounded-lg text-primary transition-colors"
-              title="Edit"
-            >
-              <span class="material-symbols-outlined text-[20px]">edit</span>
-            </button>
-
-            <button
-              onclick="openDeleteModal('${element.id}')"
-              class="p-1.5 hover:bg-error-container rounded-lg text-error transition-colors"
-              title="Delete"
-            >
-              <span class="material-symbols-outlined text-[20px]">delete</span>
-            </button>
-
-            <button
-              onclick="openHistoryModal('${element.id}')"
-              class="p-1.5 hover:bg-surface-container rounded-lg text-outline transition-colors"
-              title="History"
-            >
-              <span class="material-symbols-outlined text-[20px]">history</span>
-            </button>
-
-          </div>
-        </td>
-
-      </tr>
-    `;
+        </div>
+      </td>
+    </tr>
+  `;
   });
 }
-function renderTableUser(data) {
-  let tbody = document.getElementById("tableUser");
 
+// ─── Render Users Table ───────────────────────────────────────────────────────
+function renderTableUser(data) {
+  const tbody = document.getElementById("tableUser");
+  if (!tbody) return;
   tbody.innerHTML = "";
 
   data.forEach((element) => {
     tbody.innerHTML += `
      <tr
-                    class="hover:bg-surface-container-low transition-colors group"
+        style="transition: background 0.2s;"
+        onmouseover="this.style.backgroundColor='var(--surface-container-low)'"
+        onmouseout="this.style.backgroundColor=''"
                   >
-                    <td class="px-6 py-5 font-medium text-on-surface">
-                      ${element.id}
-                    </td>
-                    <td class="px-6 py-5 font-semibold text-on-surface">
-                      ${element.name}
-                    </td>
-                    <td class="px-6 py-5 text-on-surface-variant">
-                      ${element.email}
-                    </td>
-                    <td class="px-6 py-5 text-on-surface-variant">  ${element.phoneNumber}</td>
-                    <td class="px-6 py-5 text-on-surface"> ${element.location}</td>
-                    <td class="px-6 py-5">
-                      <div class="flex items-center justify-center gap-2">
-                        <button
-                        onclick="openDeleteEmployee('${element.id}')"
-                          class="p-1.5 hover:bg-error-container rounded-lg text-error transition-colors"
-                          title="Delete"
-                        >
-                          <span class="material-symbols-outlined text-[20px]"
-                            >delete</span
-                          >
+        <td style="padding:14px 24px; font-weight:500; color:var(--on-surface); vertical-align:middle;">${element.id}</td>
+        <td style="padding:14px 24px; font-weight:600; color:var(--on-surface); vertical-align:middle;">${element.name}</td>
+        <td style="padding:14px 24px; color:var(--on-surface-variant); vertical-align:middle;">${element.email}</td>
+        <td style="padding:14px 24px; color:var(--on-surface-variant); vertical-align:middle;">${element.phoneNumber}</td>
+        <td style="padding:14px 24px; color:var(--on-surface); vertical-align:middle;">${element.location}</td>
+        <td style="padding:14px 24px; vertical-align:middle;">
+          <div style="display:flex; align-items:center; justify-content:center;">
+            <button onclick="openDeleteEmployee('${element.id}')" class="action-btn danger-action" title="Delete">
+              <span class="material-symbols-outlined" style="font-size:19px;">delete</span>
                         </button>
                       </div>
                     </td>
@@ -249,23 +252,88 @@ function renderTableUser(data) {
     `;
   });
 }
+// ─── Render Technicians Table ───────────────────────────────────────────────────────
+function renderTableTechnicians(data) {
+  const tbody = document.getElementById("tableTechnician");
+  if (!tbody) return;
+  tbody.innerHTML = "";
 
+  data.forEach((element) => {
+    const categoriesHTML = element.categories
+      .map(
+        (cat) => `
+      <span class="badge bg-secondary me-1 mb-1">${cat.name}</span>
+    `,
+      )
+      .join("");
+
+    tbody.innerHTML += `
+     <tr
+        style="transition: background 0.2s;"
+        onmouseover="this.style.backgroundColor='var(--surface-container-low)'"
+        onmouseout="this.style.backgroundColor=''"
+      >
+        <td style="padding:14px 24px; font-weight:500; color:var(--on-surface); vertical-align:middle;">${element.id}</td>
+        <td style="padding:14px 24px; font-weight:600; color:var(--on-surface); vertical-align:middle;">${element.name}</td>
+        <td style="padding:14px 24px; color:var(--on-surface-variant); vertical-align:middle;">${element.email}</td>
+        <td style="padding:14px 24px; color:var(--on-surface-variant); vertical-align:middle;">${element.phoneNumber}</td>
+        <td style="padding:14px 24px; color:var(--on-surface); vertical-align:middle;">${element.location}</td>
+        <td style="padding:14px 24px; color:var(--on-surface); vertical-align:middle;">
+          <button
+            class="btn btn-sm btn-outline-secondary"
+            type="button"
+            data-bs-toggle="popover"
+            data-bs-placement="left"
+            data-bs-html="true"
+            data-bs-content="${categoriesHTML.replace(/"/g, "&quot;")}"
+            data-bs-trigger="hover"
+            style="transition: all 0.2s;"
+            onmouseover="this.classList.remove('btn-outline-secondary'); this.classList.add('btn-secondary');"
+            onmouseout="this.classList.remove('btn-secondary'); this.classList.add('btn-outline-secondary');"
+          >
+            ${element.categories.length} 
+            ${element.categories.length === 1 ? "Category" : "Categories"}
+          </button>
+        </td>
+        <td style="padding:14px 24px; vertical-align:middle;">
+          <div style="display:flex; align-items:center; justify-content:center;">
+            <button onclick="openDeleteTechnicians('${element.id}')" class="action-btn danger-action" title="Delete">
+              <span class="material-symbols-outlined" style="font-size:19px;">delete</span>
+            </button>
+            <button 
+              onclick="openEditEmployee('${element.id}')" 
+              class="action-btn primary-action"
+              title="Edit"
+            >
+              <span class="material-symbols-outlined" style="font-size:19px;">edit</span>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  });
+
+  // ✅ فعّل الـ Popovers
+  document.querySelectorAll('[data-bs-toggle="popover"]').forEach((el) => {
+    new bootstrap.Popover(el, {
+      container: "body",
+    });
+  });
+}
+// ─── Filter ───────────────────────────────────────────────────────────────────
 function filterByStatus(status) {
   if (status === "All Statuses") {
     renderTable(allRequests);
     return;
   }
-
-  const filtered = allRequests.filter((x) => x.statusName === status);
-
-  renderTable(filtered);
+  renderTable(allRequests.filter((x) => x.statusName === status));
 }
 
+// ─── Stats ────────────────────────────────────────────────────────────────────
 async function loadStats() {
   const token = localStorage.getItem("token");
-
   const response = await fetch(
-    "https://localhost:7128/api/Request/dashboard-stats-by-user",
+    "http://localhost:8080/api/Request/dashboard-stats-by-user",
     {
       method: "GET",
       headers: {
@@ -275,20 +343,16 @@ async function loadStats() {
     },
   );
   const data = await response.json();
-
   document.getElementById("Total").innerText = data.totalRequests;
-
   document.getElementById("New").innerText = data.newRequests;
-
   document.getElementById("Progress").innerText = data.inProgressRequests;
-
   document.getElementById("Done").innerText = data.doneRequests;
 }
+
 async function loadStatsAdmin() {
   const token = localStorage.getItem("token");
-
   const response = await fetch(
-    "https://localhost:7128/api/Request/dashboard-stats",
+    "http://localhost:8080/api/Request/dashboard-stats",
     {
       method: "GET",
       headers: {
@@ -298,130 +362,134 @@ async function loadStatsAdmin() {
     },
   );
   const data = await response.json();
-
   document.getElementById("TotalAdmin").innerText = data.totalRequests;
-
   document.getElementById("NewAdmin").innerText = data.newRequests;
-
   document.getElementById("ProgressAdmin").innerText = data.inProgressRequests;
-
   document.getElementById("DoneAdmin").innerText = data.doneRequests;
 }
+
+// ─── Modal Open / Close ───────────────────────────────────────────────────────
 function openModal() {
-  const modal = document.getElementById("requestModal");
-
-  modal.classList.remove("hidden");
-
-  modal.classList.add("flex");
+  showModal("requestModal");
 }
-
 function closeModal() {
-  const modal = document.getElementById("requestModal");
-
-  modal.classList.remove("flex");
-  modal.classList.add("hidden");
-
+  hideModal("requestModal");
   document.getElementById("categorySelect").selectedIndex = 0;
   document.getElementById("requestForm").reset();
 }
 
+function openDetails() {
+  showModal("detailsModal");
+}
+function closeDetails() {
+  hideModal("detailsModal");
+}
+
+function openEditModal() {
+  showModal("editRequestModal");
+}
+function closeEditModal() {
+  hideModal("editRequestModal");
+}
+
+function openDeleteModal(id) {
+  deleteRequestId = id;
+  const role = localStorage.getItem("role");
+  showModal(role === "Admin" ? "deleteModalAdmin" : "deleteModal");
+}
+function closeDeleteModal() {
+  const role = localStorage.getItem("role");
+  hideModal(role === "Admin" ? "deleteModalAdmin" : "deleteModal");
+}
+
+function openDeleteEmployee(id) {
+  deleteUserId = id;
+  showModal("deleteModalUser");
+}
+function closeDeleteEmployeel() {
+  hideModal("deleteModalUser");
+}
+function openDeleteTechnicians(id) {
+  deleteUserId = id;
+  showModal("deleteModalTechnicians");
+}
+function closeDeleteTechnicians() {
+  hideModal("deleteModalTechnicians");
+}
+function openEditEmployee(id) {
+  currentEmployeeId = id;
+  showModal("editEmployeeModal");
+}
+
+function closeEditEmployeeModal() {
+  hideModal("editEmployeeModal");
+}
+
+// ─── Categories ───────────────────────────────────────────────────────────────
 async function loadCategories() {
   try {
     const token = localStorage.getItem("token");
-
     const res = await fetch(
-      "https://localhost:7128/api/Catagory/Get_All_Catagory",
+      "http://localhost:8080/api/Catagory/Get_All_Catagory",
       {
         method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       },
     );
-
     const data = await res.json();
 
-    const select = document.getElementById("categorySelect");
-
-    const select2 = document.getElementById("editCategorySelect");
-
-    const select3 = document.getElementById("editCategorySelectAdmin");
-
+    const selectors = [
+      "categorySelect",
+      "editCategorySelect",
+      "categorySelect2",
+    ];
     data.forEach((category) => {
-      // ===== Create Request =====
-      if (select) {
-        const option1 = document.createElement("option");
-
-        option1.value = category.id;
-
-        option1.textContent = category.name;
-
-        select.appendChild(option1);
-      }
-
-      // ===== Edit Request =====
-      if (select2) {
-        const option2 = document.createElement("option");
-
-        option2.value = category.id;
-
-        option2.textContent = category.name;
-
-        select2.appendChild(option2);
-      }
-
-      // ===== Admin Edit =====
-      if (select3) {
-        const option3 = document.createElement("option");
-
-        option3.value = category.id;
-
-        option3.textContent = category.name;
-
-        select3.appendChild(option3);
-      }
+      selectors.forEach((selId) => {
+        const sel = document.getElementById(selId);
+        if (!sel) return;
+        const opt = document.createElement("option");
+        opt.value = category.id;
+        opt.textContent = category.name;
+        sel.appendChild(opt);
+      });
     });
   } catch (error) {
     console.log("Error loading categories:", error);
   }
 }
 
+// ─── Create Request ───────────────────────────────────────────────────────────
 document
   .getElementById("requestForm")
-  .addEventListener("submit", async function (e) {
+  ?.addEventListener("submit", async function (e) {
     e.preventDefault();
-
     const token = localStorage.getItem("token");
-
-    const title = this.querySelector("input[placeholder='Title']").value;
-    const description = this.querySelector("textarea").value;
-    const location = this.querySelector("input[placeholder='Location']").value;
-    const categoryId = document.getElementById("categorySelect").value;
-    const image = this.querySelector("input[type='file']").files[0];
-    const employeeNotes = this.querySelector(
-      "input[placeholder='EmployeeNotes']",
-    ).value;
-
     const formData = new FormData();
-
-    formData.append("title", title);
-    formData.append("description", description);
-    formData.append("categoryId", categoryId);
-
-    formData.append("requestDetail.location", location);
-    formData.append("requestDetail.employeeNotes", employeeNotes);
-
-    if (image) {
-      formData.append("requestDetail.image", image);
-    }
+    formData.append(
+      "title",
+      this.querySelector("input[placeholder='Title']").value,
+    );
+    formData.append("description", this.querySelector("textarea").value);
+    formData.append(
+      "categoryId",
+      document.getElementById("categorySelect").value,
+    );
+    formData.append(
+      "requestDetail.location",
+      this.querySelector("input[placeholder='Location']").value,
+    );
+    formData.append(
+      "requestDetail.employeeNotes",
+      this.querySelector("input[placeholder='EmployeeNotes']").value,
+    );
+    const image = this.querySelector("input[type='file']").files[0];
+    if (image) formData.append("requestDetail.image", image);
 
     const res = await fetch(
-      "https://localhost:7128/api/Request/Create_Request",
+      "http://localhost:8080/api/Request/Create_Request",
       {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
         body: formData,
       },
     );
@@ -432,12 +500,12 @@ document
     }
   });
 
+// ─── Get Details ──────────────────────────────────────────────────────────────
 async function getDetails(id) {
   try {
     const token = localStorage.getItem("token");
-
     const response = await fetch(
-      `https://localhost:7128/api/Request/Get_Request_By_Id?id=${id}`,
+      `http://localhost:8080/api/Request/Get_Request_By_Id?id=${id}`,
       {
         method: "GET",
         headers: {
@@ -446,132 +514,92 @@ async function getDetails(id) {
         },
       },
     );
-
     const data = await response.json();
 
-    // ===== Details Modal =====
-
     document.getElementById("title").innerText = data.title || "";
-
     document.getElementById("description").innerText = data.description || "";
-
     document.getElementById("employee").innerText = data.employeeName || "";
-
     document.getElementById("technician").innerText = data.technicianName || "";
-
     document.getElementById("category").innerText = data.categoryName || "";
-
     document.getElementById("status").innerText = data.statusName || "";
-
     document.getElementById("createdAt").innerText = data.createdAt || "";
-
     document.getElementById("location").innerText =
       data.requestDetail.location || "";
-
     document.getElementById("employeeNotes").innerText =
       data.requestDetail.employeeNotes || "";
-
     document.getElementById("technicianNotes").innerText =
       data.requestDetail.technicianNotes || "";
-
     document.getElementById("requestImage").src =
       data.requestDetail.imageUrl || "";
 
-    // ===== Edit Modal Inputs =====
-
     document.getElementById("editTitle").value = data.title || "";
-
     document.getElementById("editDescription").value = data.description || "";
-
     document.getElementById("editLocation").value =
       data.requestDetail.location || "";
-
     document.getElementById("editEmployeeNotes").value =
       data.requestDetail.employeeNotes || "";
-
     document.getElementById("editCategorySelect").value = data.categoryId || "";
 
-    // حفظ الايدي للتعديل
     currentRequestId = data.id;
   } catch (error) {
     console.log(error);
   }
 }
 
+// ─── Edit Request ─────────────────────────────────────────────────────────────
 document
   .getElementById("editRequestForm")
-  .addEventListener("submit", async function (e) {
+  ?.addEventListener("submit", async function (e) {
     e.preventDefault();
-
     try {
       const token = localStorage.getItem("token");
-
       const formData = new FormData();
-
-      // البيانات الأساسية
       formData.append("Title", document.getElementById("editTitle").value);
-
       formData.append(
         "Description",
         document.getElementById("editDescription").value,
       );
-
       formData.append(
         "CategoryId",
         document.getElementById("editCategorySelect").value,
       );
-
-      // RequestDetail
       formData.append(
         "RequestDetail.Location",
         document.getElementById("editLocation").value,
       );
-
       formData.append(
         "RequestDetail.EmployeeNotes",
         document.getElementById("editEmployeeNotes").value,
       );
-
-      // الصورة
       const imageFile = document.getElementById("editImage").files[0];
-
-      if (imageFile) {
-        formData.append("RequestDetail.Image", imageFile);
-      }
+      if (imageFile) formData.append("RequestDetail.Image", imageFile);
 
       const response = await fetch(
-        `https://localhost:7128/api/Request/Update_Request?id=${currentRequestId}`,
+        `http://localhost:8080/api/Request/Update_Request?id=${currentRequestId}`,
         {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
           body: formData,
         },
       );
-
       if (response.ok) {
         GetRequestsCurrantTechnicianOrEmployee();
+        GetAllRequests();
         closeEditModal();
       }
     } catch (error) {
       console.log(error);
     }
   });
+
+// ─── Delete Request ───────────────────────────────────────────────────────────
 async function confirmDelete() {
   try {
     const token = localStorage.getItem("token");
-
     const response = await fetch(
-      `https://localhost:7128/api/Request/Delete_Request?id=${deleteRequestId}`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
+      `http://localhost:8080/api/Request/Delete_Request?id=${deleteRequestId}`,
+      { method: "POST", headers: { Authorization: `Bearer ${token}` } },
     );
-
     if (response.ok) {
       closeDeleteModal();
       GetRequestsCurrantTechnicianOrEmployee();
@@ -584,42 +612,32 @@ async function confirmDelete() {
     console.log(error);
   }
 }
+
 async function confirmDeleteUser() {
   try {
     const token = localStorage.getItem("token");
-
     const response = await fetch(
-      `https://localhost:7128/api/User/Delete_User?id=${deleteUserId}`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
+      `http://localhost:8080/api/User/Delete_User?id=${deleteUserId}`,
+      { method: "POST", headers: { Authorization: `Bearer ${token}` } },
     );
-
     if (response.ok) {
       closeDeleteEmployeel();
       GetAllEmployee();
-    } else {
-      alert("Failed to delete request");
-    }
+      closeDeleteTechnicians();
+      GetAllTechnicians();
+    } else alert("Failed to delete user");
   } catch (error) {
     console.log(error);
   }
 }
+
+// ─── History Modal ────────────────────────────────────────────────────────────
 async function openHistoryModal(requestId) {
-  const modal = document.getElementById("historyModal");
-
-  modal.classList.remove("hidden");
-
-  modal.classList.add("flex");
-
+  showModal("historyModal");
   try {
     const token = localStorage.getItem("token");
-
     const response = await fetch(
-      `https://localhost:7128/api/Request/Get_Request_History_By_Id?requestId=${requestId}`,
+      `http://localhost:8080/api/Request/Get_Request_History_By_Id?requestId=${requestId}`,
       {
         method: "GET",
         headers: {
@@ -628,195 +646,91 @@ async function openHistoryModal(requestId) {
         },
       },
     );
-
     const data = await response.json();
-
     const container = document.getElementById("historyContainer");
-
     container.innerHTML = "";
 
-    // الحالة
     const status = data.newStatusName || data.oldStatusName;
-
-    // UI حسب الحالة
     const ui = getStatusUI(status);
 
-    // كارد واحد فقط
     const card = document.createElement("div");
-
-    card.className = `
-  border-l-4 ${ui.color}
-  bg-white rounded-2xl p-5 shadow-sm
-`;
-
-    // المحتوى
+    card.className = "history-card";
     card.innerHTML = `
-  <div class="flex items-start justify-between">
-
-    <!-- Left -->
-    <div class="flex items-start gap-3">
-
-      <span class="material-symbols-outlined text-3xl">
-        ${ui.icon}
-      </span>
-
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px;">
+        <div style="display:flex; align-items:flex-start; gap:12px;">
+          <span class="material-symbols-outlined history-icon ${ui.cls}" style="font-size:2rem;">${ui.icon}</span>
       <div>
-
-        <p class="text-xs text-gray-400">Employee</p>
-        <h3 class="font-semibold text-lg">
-          ${data.employeeName}
-        </h3>
-
-        <p class="text-xs text-gray-400 mt-3">Changed At</p>
-        <p class="text-sm text-gray-600">
-          ${data.changedAt}
-        </p>
-
+            <p style="font-size:0.75rem; color:#aaa; margin:0;">Employee</p>
+            <h3 style="font-weight:700; font-size:1.05rem; margin:2px 0 0;">${data.employeeName}</h3>
+            <p style="font-size:0.75rem; color:#aaa; margin:12px 0 0;">Changed At</p>
+            <p style="font-size:0.875rem; color:#555; margin:2px 0 0;">${data.changedAt}</p>
       </div>
     </div>
-
-    <!-- Status -->
-    <span class="px-4 py-2 rounded-full text-sm font-semibold ${ui.color}">
+        <span class="status-badge ${ui.cls}" style="white-space:nowrap;">
       ${data.oldStatusName} → ${data.newStatusName || "No Change"}
     </span>
-
   </div>
-
-  <!-- Comment -->
-  <div class="mt-4 pl-11">
-    <p class="text-xs text-gray-400">Comment</p>
-    <p class="text-sm text-gray-600">
-      ${data.comment || "No Comment"}
-    </p>
+      <div style="margin-top:16px; padding-left:44px;">
+        <p style="font-size:0.75rem; color:#aaa; margin:0;">Comment</p>
+        <p style="font-size:0.875rem; color:#555; margin:4px 0 0;">${data.comment || "No Comment"}</p>
   </div>
 `;
-
     container.appendChild(card);
   } catch (error) {
     console.log(error);
   }
 }
+
+function closeHistoryModal() {
+  hideModal("historyModal");
+}
+
+// ─── Status UI ────────────────────────────────────────────────────────────────
 function getStatusUI(status) {
   switch (status) {
     case "New":
-      return {
-        color: "bg-blue-100 text-blue-700",
-        icon: "add_circle",
-      };
-
+      return { cls: "status-new", icon: "add_circle" };
     case "Assigned":
-      return {
-        color: "bg-yellow-100 text-yellow-700 border-yellow-300",
-        icon: "assignment_ind",
-      };
-
+      return { cls: "status-assigned", icon: "assignment_ind" };
     case "InProgress":
-      return {
-        color: "bg-orange-100 text-orange-700",
-        icon: "autorenew",
-      };
-
+      return { cls: "status-progress", icon: "autorenew" };
     case "Resolved":
-      return {
-        color: "bg-purple-100 text-purple-700 border-purple-300",
-        icon: "build",
-      };
-
+      return { cls: "status-resolved", icon: "build" };
     case "Done":
-      return {
-        color: "bg-green-100 text-green-700 border-green-300",
-        icon: "check_circle",
-      };
-
+      return { cls: "status-done", icon: "check_circle" };
     default:
-      return {
-        color: "bg-gray-100 text-gray-700 border-gray-300",
-        icon: "help",
-      };
+      return { cls: "status-default", icon: "help" };
   }
 }
+document
+  .getElementById("editEmployeeForm")
+  ?.addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-function closeHistoryModal() {
-  const modal = document.getElementById("historyModal");
+    const categorySelect = document.getElementById("categorySelect2");
+    const token = localStorage.getItem("token");
 
-  modal.classList.remove("flex");
+    const selectedOptions = Array.from(categorySelect.selectedOptions);
+    const categoryIds = selectedOptions.map((opt) => opt.value);
 
-  modal.classList.add("hidden");
-}
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/TC/UpdateTCByTechnicianId?TechnicianId=${currentEmployeeId}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(categoryIds), // ✅ array مباشرة
+        },
+      );
 
-function closeDetails() {
-  const modal = document.getElementById("detailsModal");
-
-  modal.classList.remove("flex");
-  modal.classList.add("hidden");
-}
-function openDetails() {
-  const modal = document.getElementById("detailsModal");
-
-  modal.classList.remove("hidden");
-  modal.classList.add("flex");
-}
-function openEditModal() {
-  const modal = document.getElementById("editRequestModal");
-
-  modal.classList.remove("hidden");
-  modal.classList.add("flex");
-}
-
-function closeEditModal() {
-  const modal = document.getElementById("editRequestModal");
-
-  modal.classList.add("hidden");
-  modal.classList.remove("flex");
-}
-
-function openDeleteModal(id) {
-  deleteRequestId = id;
-
-  const role = localStorage.getItem("role");
-
-  let modal;
-
-  if (role == "Admin") {
-    modal = document.getElementById("deleteModalAdmin");
-  } else {
-    modal = document.getElementById("deleteModal");
-  }
-
-  modal.classList.remove("hidden");
-
-  modal.classList.add("flex");
-}
-
-function closeDeleteModal() {
-  const role = localStorage.getItem("role");
-
-  let modal;
-
-  if (role == "Admin") {
-    modal = document.getElementById("deleteModalAdmin");
-  } else {
-    modal = document.getElementById("deleteModal");
-  }
-
-  modal.classList.remove("flex");
-
-  modal.classList.add("hidden");
-}
-function openDeleteEmployee(id) {
-  deleteUserId = id;
-
-  let modal = document.getElementById("deleteModalUser");
-
-  modal.classList.remove("hidden");
-
-  modal.classList.add("flex");
-}
-
-function closeDeleteEmployeel() {
-  let modal = document.getElementById("deleteModalUser");
-
-  modal.classList.remove("flex");
-
-  modal.classList.add("hidden");
-}
+      if (response.ok) {
+        closeEditEmployeeModal();
+        GetAllTechnicians();
+      }
+    } catch (error) {
+      console.error("Error updating categories:", error);
+    }
+  });

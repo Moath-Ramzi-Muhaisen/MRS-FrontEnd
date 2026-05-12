@@ -1,87 +1,58 @@
 <!doctype html>
-
-<html class="light" lang="en">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>MRS Employee Dashboard</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <!-- Google Fonts -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Manrope:wght@600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Manrope:wght@600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
       rel="stylesheet"
     />
-    <script id="tailwind-config">
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            colors: {
-              error: "#ba1a1a",
-              "surface-container-high": "#e8e8e8",
-              "inverse-surface": "#2f3131",
-              "on-primary-fixed-variant": "#004493",
-              "on-primary-fixed": "#001a41",
-              "inverse-primary": "#adc6ff",
-              "outline-variant": "#c1c6d7",
-              "on-tertiary": "#ffffff",
-              "on-secondary": "#ffffff",
-              "on-secondary-container": "#52617d",
-              "on-secondary-fixed": "#0b1c34",
-              "tertiary-fixed-dim": "#c0c7cf",
-              "surface-container-lowest": "#ffffff",
-              "on-surface-variant": "#414755",
-              "on-surface": "#1a1c1c",
-              "secondary-fixed-dim": "#b7c7e7",
-              surface: "#f9f9f9",
-              outline: "#717786",
-              "primary-fixed": "#d8e2ff",
-              "on-error-container": "#93000a",
-              "surface-variant": "#e2e2e2",
-              "error-container": "#ffdad6",
-              secondary: "#505f7a",
-              "surface-container-low": "#f3f3f4",
-              "secondary-container": "#ceddfe",
-              "surface-container": "#eeeeee",
-              "surface-container-highest": "#e2e2e2",
-              "primary-fixed-dim": "#adc6ff",
-              primary: "#0058bc",
-              "on-tertiary-container": "#fcfcff",
-              "on-primary": "#ffffff",
-              "on-background": "#1a1c1c",
-              "on-secondary-fixed-variant": "#384761",
-              tertiary: "#555d63",
-              "on-primary-container": "#fefcff",
-              "tertiary-fixed": "#dce3eb",
-              "on-tertiary-fixed": "#151c22",
-              "primary-container": "#0070eb",
-              "on-error": "#ffffff",
-              "surface-dim": "#dadada",
-              background: "#f9f9f9",
-              "surface-bright": "#f9f9f9",
-              "secondary-fixed": "#d6e3ff",
-              "on-tertiary-fixed-variant": "#40484e",
-              "tertiary-container": "#6e757c",
-              "inverse-on-surface": "#f0f1f1",
-              "surface-tint": "#005bc1",
-            },
-            borderRadius: {
-              DEFAULT: "0.25rem",
-              lg: "0.5rem",
-              xl: "0.75rem",
-              card: "20px",
-              full: "9999px",
-            },
-            fontFamily: {
-              headline: ["Manrope", "sans-serif"],
-              display: ["Manrope", "sans-serif"],
-              body: ["Inter", "sans-serif"],
-              label: ["Inter", "sans-serif"],
-            },
-          },
-        },
-      };
-    </script>
+
+    <!-- Bootstrap 5 -->
+    <link href="style.css" rel="stylesheet" />
+
     <style>
+      /* ── Design Tokens ── */
+      :root {
+        --primary: #0058bc;
+        --primary-container: #0070eb;
+        --on-primary: #ffffff;
+        --secondary: #505f7a;
+        --secondary-container: #ceddfe;
+        --on-secondary-container: #52617d;
+        --surface: #f9f9f9;
+        --surface-container-lowest: #ffffff;
+        --surface-container-low: #f3f3f4;
+        --surface-container: #eeeeee;
+        --surface-container-high: #e8e8e8;
+        --surface-variant: #e2e2e2;
+        --on-surface: #1a1c1c;
+        --on-surface-variant: #414755;
+        --on-background: #1a1c1c;
+        --outline: #717786;
+        --outline-variant: #c1c6d7;
+        --error: #ba1a1a;
+        --background: #f9f9f9;
+      }
+
+      /* ── Base ── */
+      body {
+        background-color: var(--background);
+        color: var(--on-background);
+        font-family: "Inter", sans-serif;
+        min-height: 100vh;
+        padding-bottom: 80px;
+      }
+      @media (min-width: 768px) {
+        body {
+          padding-bottom: 0;
+          padding-top: 64px;
+        }
+      }
+
       .material-symbols-outlined {
         font-variation-settings:
           "FILL" 0,
@@ -89,317 +60,813 @@
           "GRAD" 0,
           "opsz" 24;
       }
-      .diffused-shadow {
+
+      /* ── Top App Bar ── */
+      .top-bar {
+        height: 64px;
+        background-color: var(--surface);
+        border-bottom: 1px solid var(--surface-container);
+        backdrop-filter: blur(8px);
+      }
+      .logo-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--primary);
+        color: var(--on-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+      .logo-circle img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .brand-name {
+        font-family: "Manrope", sans-serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin: 0;
+      }
+
+      /* Desktop nav links */
+      .nav-link-custom {
+        color: var(--on-surface-variant);
+        font-weight: 600;
+        padding: 8px 12px;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: background 0.2s;
+      }
+      .nav-link-custom:hover {
+        background-color: var(--surface-container-low);
+        color: var(--on-surface-variant);
+      }
+      .nav-link-custom.active {
+        color: var(--primary);
+      }
+
+      /* Notification bell */
+      .icon-btn {
+        background: none;
+        border: none;
+        color: var(--on-surface-variant);
+        padding: 8px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .icon-btn:hover {
+        background-color: var(--surface-container-low);
+      }
+
+      /* Avatar */
+      .avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 1px solid var(--outline-variant);
+      }
+      .avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* ── Page Heading ── */
+      .page-title {
+        font-family: "Manrope", sans-serif;
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: var(--on-surface);
+        letter-spacing: -0.02em;
+      }
+      .page-subtitle {
+        color: var(--on-surface-variant);
+        margin-top: 4px;
+      }
+
+      /* Add Request button */
+      .btn-add {
+        background-color: var(--primary);
+        color: var(--on-primary);
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        padding: 12px 24px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(0, 88, 188, 0.25);
+        transition: transform 0.15s;
+        cursor: pointer;
+      }
+      .btn-add:hover {
+        transform: scale(0.96);
+        color: var(--on-primary);
+      }
+
+      /* ── Stat Cards ── */
+      .stat-card {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(10, 27, 51, 0.06);
+        padding: 24px;
+        height: 128px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border-left: 4px solid transparent;
+      }
+      .stat-card.total {
+        border-color: #1e3a5f;
+      }
+      .stat-card.new {
+        border-color: #38bdf8;
+      }
+      .stat-card.progress {
+        border-color: #fb923c;
+      }
+      .stat-card.done {
+        border-color: #10b981;
+      }
+
+      .stat-label {
+        color: var(--on-surface-variant);
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+      .stat-value {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: var(--on-surface);
+        text-align: center;
+      }
+
+      /* ── Filter Bar ── */
+      .filter-bar {
+        background-color: var(--surface-container-lowest);
+        padding: 16px;
+        border-radius: 20px 20px 0 0;
+        border: 1px solid var(--surface-container);
+        border-bottom: none;
+      }
+      .search-wrap {
+        position: relative;
+      }
+      .search-wrap .search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--outline);
+        pointer-events: none;
+        font-family: "Material Symbols Outlined";
+      }
+      .search-input {
+        width: 100%;
+        padding: 10px 16px 10px 44px;
+        background-color: var(--surface-container-low);
+        border: none;
+        border-radius: 12px;
+        color: var(--on-surface);
+        font-family: "Inter", sans-serif;
+        outline: none;
+        transition: box-shadow 0.2s;
+      }
+      .search-input::placeholder {
+        color: var(--outline);
+      }
+      .search-input:focus {
+        box-shadow: 0 0 0 2px rgba(0, 88, 188, 0.2);
+      }
+
+      .select-wrap {
+        position: relative;
+      }
+      .select-wrap .chevron {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--outline);
+        pointer-events: none;
+        font-family: "Material Symbols Outlined";
+        font-size: 20px;
+      }
+      .filter-select {
+        width: 100%;
+        padding: 10px 40px 10px 16px;
+        background-color: var(--surface-container-low);
+        border: none;
+        border-radius: 12px;
+        color: var(--on-surface);
+        font-family: "Inter", sans-serif;
+        font-weight: 500;
+        appearance: none;
+        cursor: pointer;
+        outline: none;
+        transition: box-shadow 0.2s;
+      }
+      .filter-select:focus {
+        box-shadow: 0 0 0 2px rgba(0, 88, 188, 0.2);
+      }
+
+      /* ── Table Card ── */
+      .table-card {
+        background-color: var(--surface-container-lowest);
+        border-radius: 0 0 20px 20px;
+        border: 1px solid var(--surface-container);
+        overflow: hidden;
         box-shadow: 0px 10px 30px rgba(10, 27, 51, 0.05);
       }
-      .glass-header {
-        backdrop-filter: blur(8px);
-        background-color: rgba(249, 249, 249, 0.8);
+      .table thead tr {
+        background-color: var(--surface-container-low);
+        border-bottom: 1px solid var(--surface-container);
+      }
+      .table thead th {
+        padding: 16px 24px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--on-surface-variant);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        border: none;
+      }
+      .table tbody tr {
+        border-bottom: 1px solid var(--surface-container);
+      }
+      .table tbody td {
+        padding: 14px 24px;
+        border: none;
+        vertical-align: middle;
+      }
+      .table tbody tr:last-child {
+        border-bottom: none;
+      }
+
+      /* ── Pagination ── */
+      .pagination-bar {
+        background-color: var(--surface-container-low);
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .pagination-bar p {
+        font-size: 0.875rem;
+        color: var(--on-surface-variant);
+        font-weight: 500;
+        margin: 0;
+      }
+      .page-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--outline-variant);
+        background: none;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.2s;
+      }
+      .page-btn:hover:not(:disabled) {
+        background-color: var(--surface-container);
+      }
+      .page-btn:disabled {
+        opacity: 0.3;
+        cursor: default;
+      }
+      .page-btn.active-page {
+        background-color: var(--primary);
+        color: #fff;
+        border-color: var(--primary);
+        box-shadow: 0 2px 8px rgba(0, 88, 188, 0.3);
+      }
+
+      /* ── Bottom Nav (Mobile) ── */
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: var(--surface-container-lowest);
+        box-shadow: 0px -10px 30px rgba(10, 27, 51, 0.05);
+        border-radius: 16px 16px 0 0;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 8px 16px 12px;
+        z-index: 50;
+      }
+      .bottom-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        color: var(--secondary);
+        transition:
+          color 0.2s,
+          transform 0.15s;
+        padding: 4px 12px;
+        border-radius: 20px;
+      }
+      .bottom-nav-item.active-nav {
+        background-color: var(--secondary-container);
+        color: var(--on-secondary-container);
+      }
+      .bottom-nav-item:active {
+        transform: scale(0.9);
+      }
+      .bottom-nav-item span.nav-label {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 2px;
+      }
+
+      /* ── FAB (Mobile) ── */
+      .fab {
+        position: fixed;
+        bottom: 96px;
+        right: 20px;
+        width: 56px;
+        height: 56px;
+        background-color: var(--primary);
+        color: #fff;
+        border-radius: 50%;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 20px rgba(0, 88, 188, 0.35);
+        z-index: 40;
+        cursor: pointer;
+        transition: transform 0.15s;
+      }
+      .fab:active {
+        transform: scale(0.95);
+      }
+
+      /* ── Modals ── */
+      .mrs-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1050;
+      }
+      .mrs-modal-overlay.show {
+        display: flex;
+      }
+
+      .mrs-modal {
+        background: #fff;
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      .mrs-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .mrs-modal-header h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+      }
+      .close-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 50%;
+        transition: background 0.2s;
+        display: flex;
+        align-items: center;
+      }
+      .close-btn:hover {
+        background-color: #f3f3f4;
+      }
+
+      .mrs-input {
+        width: 100%;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 12px;
+        font-family: "Inter", sans-serif;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .mrs-input:focus {
+        border-color: var(--primary);
+      }
+      .mrs-label {
+        display: block;
+        font-size: 0.875rem;
+        color: #888;
+        margin-bottom: 4px;
+      }
+
+      .btn-submit {
+        width: 100%;
+        background-color: #2563eb;
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: 12px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .btn-submit:hover {
+        background-color: #1d4ed8;
+      }
+
+      /* Detail grid */
+      .detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      .detail-cell {
+        background: #f8f8f8;
+        padding: 12px;
+        border-radius: 12px;
+      }
+      .detail-cell.full {
+        grid-column: 1 / -1;
+      }
+      .detail-cell p.cell-label {
+        color: #aaa;
+        font-size: 0.75rem;
+        margin: 0 0 2px;
+      }
+      .detail-cell p.cell-value {
+        font-weight: 600;
+        color: #1a1c1c;
+        margin: 0;
+      }
+
+      /* ── Status Badges ── */
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 14px;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        transition: transform 0.2s;
+        white-space: nowrap;
+      }
+      .status-new {
+        background: #dbeafe;
+        color: #1d4ed8;
+      }
+      .status-assigned {
+        background: #fef9c3;
+        color: #a16207;
+        border: 1px solid #fde047;
+      }
+      .status-progress {
+        background: #ffedd5;
+        color: #c2410c;
+      }
+      .status-resolved {
+        background: #f3e8ff;
+        color: #7e22ce;
+        border: 1px solid #d8b4fe;
+      }
+      .status-done {
+        background: #dcfce7;
+        color: #15803d;
+        border: 1px solid #86efac;
+      }
+      .status-default {
+        background: #f3f4f6;
+        color: #374151;
+        border: 1px solid #d1d5db;
+      }
+
+      /* ── Action Buttons ── */
+      .action-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 6px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.18s;
+      }
+      .primary-action {
+        color: var(--primary);
+      }
+      .primary-action:hover {
+        background-color: var(--surface-container);
+      }
+      .danger-action {
+        color: var(--error);
+      }
+      .danger-action:hover {
+        background-color: #ffdad6;
+      }
+      .ghost-action {
+        color: var(--outline);
+      }
+      .ghost-action:hover {
+        background-color: var(--surface-container);
+      }
+
+      /* ── History Card ── */
+      .history-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 1px 6px rgba(10, 27, 51, 0.07);
+        border-left: 4px solid var(--outline-variant);
+      }
+      .history-icon.status-new {
+        color: #1d4ed8;
+      }
+      .history-icon.status-assigned {
+        color: #a16207;
+      }
+      .history-icon.status-progress {
+        color: #c2410c;
+      }
+      .history-icon.status-resolved {
+        color: #7e22ce;
+      }
+      .history-icon.status-done {
+        color: #15803d;
+      }
+      .history-icon.status-default {
+        color: #374151;
+      }
+
+      /* Delete modal */
+      .delete-icon-wrap {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background-color: #fee2e2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+      }
+      .btn-cancel-del {
+        flex: 1;
+        border: 1px solid #d1d5db;
+        border-radius: 12px;
+        padding: 12px;
+        background: none;
+        cursor: pointer;
+        color: #374151;
+        transition: background 0.2s;
+      }
+      .btn-cancel-del:hover {
+        background: #f3f4f6;
+      }
+      .btn-confirm-del {
+        flex: 1;
+        border: none;
+        border-radius: 12px;
+        padding: 12px;
+        background-color: #dc2626;
+        color: #fff;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.2s;
+      }
+      .btn-confirm-del:hover {
+        background-color: #b91c1c;
       }
     </style>
   </head>
+
   <body
     onload="
-      (GetRequestsCurrantTechnicianOrEmployee(), loadStats(), loadCategories())
+      GetRequestsCurrantTechnicianOrEmployee();
+      loadStats();
+      loadCategories();
     "
-    class="bg-background text-on-background font-body min-h-screen pb-20 md:pb-0 md:pt-16"
   >
-    <!-- TopAppBar -->
+    <!-- ── Top App Bar ── -->
     <header
-      class="fixed top-0 z-50 flex items-center justify-between px-5 h-16 w-full bg-surface dark:bg-background border-b border-surface-container"
+      class="top-bar fixed-top d-flex align-items-center justify-content-between px-3 px-md-4"
     >
-      <div class="flex items-center gap-3">
-        <div
-          class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary"
-        >
-          <img src="Images/screen.png" />
+      <div class="d-flex align-items-center gap-3">
+        <div class="logo-circle">
+          <img src="Images/screen.png" alt="MRS Logo" />
         </div>
-        <h1
-          class="font-headline text-2xl font-bold text-primary dark:text-primary-fixed"
-        >
-          MRS
-        </h1>
+        <h1 class="brand-name">MRS</h1>
       </div>
-      <!-- Desktop Nav Cluster -->
-      <nav class="hidden md:flex items-center gap-8">
-        <a
-          class="text-primary dark:text-primary-fixed font-semibold hover:bg-surface-container-low transition-colors px-3 py-2 rounded-lg"
-          href="#"
-          >Home</a
-        >
-        <a
-          class="text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-low transition-colors px-3 py-2 rounded-lg"
-          href="#"
-          >Requests</a
-        >
-        <a
-          class="text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-low transition-colors px-3 py-2 rounded-lg"
-          href="#"
-          >Reports</a
-        >
-        <a
-          class="text-on-surface-variant dark:text-outline-variant hover:bg-surface-container-low transition-colors px-3 py-2 rounded-lg"
-          href="#"
-          >Settings</a
-        >
-      </nav>
-      <div class="flex items-center gap-4">
+
+      <div class="d-flex align-items-center gap-3">
         <button
-          class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-colors"
-        >
-          notifications
-        </button>
-        <div
-          class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant"
+          type="button"
+          data-bs-toggle="offcanvas"
+          data-bs-target="#demo"
+          class="border-0 bg-transparent p-0"
         >
           <img
-            alt="Medical Business Logo"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCG_ud4Hl_9Dt_QUWRfWl27pNwYry4wniEyAvDH9aBMDL290CSZDBOApu_nLQOk07OpqpLGFJxTgfxvjfVANUhugwuxHxP7XztVx0JlZkv4pWp3A5aZWiU4oFrGycZn9JFj4eEBk7ijOOTXiH91kqMGml4tnpcRASq64MsHKgRxhXPiNo4R7N9HF9_qEZ0ePEOOKm72m7pdSC6abRWX2H03n4PLgQLbBzgWvUa0OUIbfzjdBHUYAT0SmEXu4CaF6E3gB6aAv3n6bpg"
+            src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+            alt="User"
+            class="rounded-circle"
+            style="
+              width: 45px;
+              height: 45px;
+              object-fit: cover;
+              border: 2px solid #ddd;
+              cursor: pointer;
+            "
           />
-        </div>
+        </button>
       </div>
     </header>
-    <!-- Main Content Canvas -->
-    <main class="max-w-7xl mx-auto px-5 py-8 md:py-12">
-      <!-- Header Section with Stats -->
-      <div class="mb-10">
+    <!-- ── offcanvas ── -->
+    <div class="offcanvas offcanvas-end" id="demo">
+      <div class="offcanvas-header">
+        <h1 class="offcanvas-title">Heading</h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="offcanvas"
+        ></button>
+      </div>
+      <div class="offcanvas-body">
+        <p>Some text lorem ipsum.</p>
+        <p>Some text lorem ipsum.</p>
+        <p>Some text lorem ipsum.</p>
+      </div>
+    </div>
+
+    <!-- ── Main ── -->
+    <main style="max-width: 1280px; margin: 0 auto; padding: 32px 20px">
+      <!-- Page Header -->
+      <div class="mb-4">
         <div
-          class="flex flex-col md:flex-row md:items-end justify-between gap-6"
+          class="d-flex flex-column flex-md-row align-items-md-end justify-content-between gap-3"
         >
           <div>
-            <h2
-              class="font-headline text-3xl font-bold text-on-surface tracking-tight"
-            >
-              Employee Dashboard
-            </h2>
-            <p class="text-on-surface-variant mt-1">
-              Manage and track technician assignments for patient care.
+            <h2 class="page-title">Employee Dashboard</h2>
+            <p class="page-subtitle">
+              Create Requests and Track their status easily.
             </p>
           </div>
-          <button
-            onclick="openModal()"
-            class="flex items-center gap-2 bg-primary text-on-primary px-6 py-3 rounded-xl font-semibold shadow-lg hover:scale-95 transition-all"
-          >
+          <button class="btn-add" onclick="openModal()">
             <span class="material-symbols-outlined">add</span>
             Add New Request
           </button>
         </div>
       </div>
-      <!-- Quick Stats Bento Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <!-- Total Requests -->
-        <div
-          class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-blue-900 flex flex-col justify-between h-32"
-        >
-          <div class="text-on-surface-variant text-sm font-medium">
-            Total Requests
-          </div>
-          <div
-            id="Total"
-            class="text-4xl font-bold text-on-surface text-center"
-          >
-            0
+
+      <!-- Stat Cards -->
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-md-6 col-lg-3">
+          <div class="stat-card total">
+            <div class="stat-label">Total Requests</div>
+            <div id="Total" class="stat-value">0</div>
           </div>
         </div>
-        <!-- New -->
-        <div
-          class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-sky-400 flex flex-col justify-between h-32"
-        >
-          <div class="text-on-surface-variant text-sm font-medium">New</div>
-          <div id="New" class="text-4xl font-bold text-on-surface text-center">
-            0
+        <div class="col-12 col-md-6 col-lg-3">
+          <div class="stat-card new">
+            <div class="stat-label">New</div>
+            <div id="New" class="stat-value">0</div>
           </div>
         </div>
-        <!-- In Progress -->
-        <div
-          class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-orange-400 flex flex-col justify-between h-32"
-        >
-          <div class="text-on-surface-variant text-sm font-medium">
-            In Progress
-          </div>
-          <div
-            id="Progress"
-            class="text-4xl font-bold text-on-surface text-center"
-          >
-            0
+        <div class="col-12 col-md-6 col-lg-3">
+          <div class="stat-card progress">
+            <div class="stat-label">In Progress</div>
+            <div id="Progress" class="stat-value">0</div>
           </div>
         </div>
-        <!-- Done -->
-        <div
-          class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-emerald-500 flex flex-col justify-between h-32"
-        >
-          <div class="text-on-surface-variant text-sm font-medium">Done</div>
-          <div id="Done" class="text-4xl font-bold text-on-surface text-center">
-            0
+        <div class="col-12 col-md-6 col-lg-3">
+          <div class="stat-card done">
+            <div class="stat-label">Done</div>
+            <div id="Done" class="stat-value">0</div>
           </div>
         </div>
       </div>
-      <!-- Filters and Search -->
+
+      <!-- Filter Bar -->
       <div
-        class="bg-surface-container-lowest p-4 rounded-t-card border-x border-t border-surface-container flex flex-col md:flex-row gap-4 justify-between items-center"
+        class="filter-bar d-flex flex-column flex-md-row align-items-center gap-3 justify-content-between"
       >
-        <div class="relative w-full md:w-96">
-          <span
-            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline"
-            >search</span
-          >
+        <div class="search-wrap" style="width: 100%; max-width: 384px">
+          <span class="search-icon material-symbols-outlined">search</span>
           <input
-            class="w-full pl-10 pr-4 py-2.5 bg-surface-container-low border-none rounded-xl focus:ring-2 focus:ring-primary/20 text-on-surface placeholder:text-outline transition-all"
-            placeholder="Search in requests..."
+            class="search-input"
             type="text"
+            placeholder="Search in requests..."
           />
         </div>
-        <div class="flex items-center gap-3 w-full md:w-auto">
-          <div class="relative w-full md:w-48">
-            <select
-              onchange="filterByStatus(this.value)"
-              class="w-full appearance-none pl-4 pr-10 py-2.5 bg-surface-container-low border-none rounded-xl focus:ring-2 focus:ring-primary/20 text-on-surface font-medium cursor-pointer"
-            >
-              <option>All Statuses</option>
-              <option>New</option>
-              <option>Assigned</option>
-              <option>InProgress</option>
-              <option>Resolved</option>
-              <option>Done</option>
-            </select>
-            <span
-              class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-outline"
-              >expand_more</span
-            >
-          </div>
+        <div class="select-wrap" style="width: 100%; max-width: 192px">
+          <span class="chevron material-symbols-outlined">expand_more</span>
+          <select class="filter-select" onchange="filterByStatus(this.value)">
+            <option>All Statuses</option>
+            <option>New</option>
+            <option>Assigned</option>
+            <option>InProgress</option>
+            <option>Resolved</option>
+            <option>Done</option>
+          </select>
         </div>
       </div>
-      <!-- Table Card -->
-      <div
-        class="bg-surface-container-lowest rounded-b-card diffused-shadow border border-surface-container overflow-hidden"
-      >
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
+
+      <!-- Table -->
+      <div class="table-card">
+        <div class="table-responsive">
+          <table class="table mb-0">
             <thead>
-              <tr
-                class="bg-surface-container-low border-b border-surface-container"
-              >
-                <th
-                  class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest"
-                >
-                  ID
-                </th>
-                <th
-                  class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest"
-                >
-                  Request Title
-                </th>
-                <th
-                  class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest"
-                >
-                  Category
-                </th>
-                <th
-                  class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest"
-                >
-                  Status
-                </th>
-                <th
-                  class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest"
-                >
-                  Technician
-                </th>
-                <th
-                  class="px-6 py-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest text-center"
-                >
-                  Actions
-                </th>
+              <tr>
+                <th>ID</th>
+                <th>Request Title</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Technician</th>
+                <th class="text-center">Actions</th>
               </tr>
             </thead>
-            <tbody id="body" class="divide-y divide-surface-container"></tbody>
+            <tbody id="body"></tbody>
           </table>
         </div>
+
         <!-- Pagination -->
-        <div
-          class="px-6 py-4 bg-surface-container-low flex flex-col md:flex-row justify-between items-center gap-4"
-        >
-          <p class="text-sm text-on-surface-variant font-medium">
-            Showing 1 to 5 of 42 entries
-          </p>
-          <div class="flex items-center gap-2">
-            <button
-              class="w-10 h-10 rounded-xl flex items-center justify-center border border-outline-variant hover:bg-surface-container transition-colors disabled:opacity-30"
-              disabled=""
-            >
-              <span class="material-symbols-outlined">chevron_left</span>
+        <div class="pagination-bar">
+          <p>Showing 1 to 5 of 42 entries</p>
+          <div class="d-flex align-items-center gap-2">
+            <button class="page-btn" disabled>
+              <span class="material-symbols-outlined" style="font-size: 20px"
+                >chevron_left</span
+              >
             </button>
-            <button
-              class="w-10 h-10 rounded-xl flex items-center justify-center bg-primary text-on-primary font-bold shadow-md"
-            >
-              1
-            </button>
-            <button
-              class="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-surface-container transition-colors font-semibold"
-            >
-              2
-            </button>
-            <button
-              class="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-surface-container transition-colors font-semibold"
-            >
-              3
-            </button>
-            <button
-              class="w-10 h-10 rounded-xl flex items-center justify-center border border-outline-variant hover:bg-surface-container transition-colors"
-            >
-              <span class="material-symbols-outlined">chevron_right</span>
+            <button class="page-btn active-page">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">
+              <span class="material-symbols-outlined" style="font-size: 20px"
+                >chevron_right</span
+              >
             </button>
           </div>
         </div>
       </div>
     </main>
-    <!-- BottomNavBar (Mobile Only) -->
-    <nav
-      class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-surface-container-lowest dark:bg-inverse-surface shadow-[0px_-10px_30px_rgba(10,27,51,0.05)] rounded-t-xl"
-    >
-      <a
-        class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary-fixed-dim text-on-secondary-container dark:text-on-secondary-fixed rounded-full px-5 py-1 transition-transform active:scale-90"
-        href="#"
-      >
+
+    <!-- ── Bottom Nav (Mobile) ── -->
+    <nav class="bottom-nav d-md-none">
+      <a href="#" class="bottom-nav-item active-nav">
         <span
           class="material-symbols-outlined"
           style="font-variation-settings: &quot;FILL&quot; 1"
           >home</span
         >
-        <span class="text-[10px] font-bold uppercase tracking-wider mt-0.5"
-          >Home</span
-        >
+        <span class="nav-label">Home</span>
       </a>
-      <a
-        class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-fixed-variant hover:text-primary transition-colors active:scale-90"
-        href="#"
-      >
+      <a href="#" class="bottom-nav-item">
         <span class="material-symbols-outlined">pending_actions</span>
-        <span class="text-[10px] font-bold uppercase tracking-wider mt-0.5"
-          >Requests</span
-        >
+        <span class="nav-label">Requests</span>
       </a>
-      <a
-        class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-fixed-variant hover:text-primary transition-colors active:scale-90"
-        href="#"
-      >
+      <a href="#" class="bottom-nav-item">
         <span class="material-symbols-outlined">analytics</span>
-        <span class="text-[10px] font-bold uppercase tracking-wider mt-0.5"
-          >Reports</span
-        >
+        <span class="nav-label">Reports</span>
       </a>
-      <a
-        class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-fixed-variant hover:text-primary transition-colors active:scale-90"
-        href="#"
-      >
+      <a href="#" class="bottom-nav-item">
         <span class="material-symbols-outlined">settings</span>
-        <span class="text-[10px] font-bold uppercase tracking-wider mt-0.5"
-          >Settings</span
-        >
+        <span class="nav-label">Settings</span>
       </a>
     </nav>
-    <!--  Add New Request  -->
+
     <button
-      class="md:hidden fixed bottom-24 right-5 w-14 h-14 bg-primary text-on-primary rounded-full shadow-2xl flex items-center justify-center active:scale-95 transition-all z-40"
+      title="Add New Request"
+      class="fab d-none d-md-flex"
+      onclick="openModal()"
     >
       <span
         class="material-symbols-outlined"
@@ -407,310 +874,223 @@
         >add</span
       >
     </button>
-    <div
-      id="requestModal"
-      class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50"
-    >
-      <div class="bg-white w-[500px] rounded-2xl p-6 shadow-2xl">
-        <div class="flex justify-between items-center mb-5">
-          <h2 class="text-2xl font-bold">Create Request</h2>
 
-          <button onclick="closeModal()">
+    <!-- ══════════════════ MODALS ══════════════════ -->
+
+    <!-- Add Request Modal -->
+    <div id="requestModal" class="mrs-modal-overlay">
+      <div class="mrs-modal" style="max-width: 500px">
+        <div class="mrs-modal-header">
+          <h2>Create Request</h2>
+          <button class="close-btn" onclick="closeModal()">
             <span class="material-symbols-outlined">close</span>
           </button>
         </div>
-        <select id="categorySelect" class="w-full border p-3 rounded-xl">
+        <select id="categorySelect" class="mrs-input mb-3">
           <option disabled selected>Choose Category</option>
         </select>
-        <br />
-        <br />
-
-        <form id="requestForm" class="space-y-4">
-          <input
-            type="text"
-            placeholder="Title"
-            class="w-full border p-3 rounded-xl"
-          />
-
+        <form id="requestForm" class="d-flex flex-column gap-3">
+          <input type="text" placeholder="Title" class="mrs-input" />
           <textarea
             placeholder="Description"
-            class="w-full border p-3 rounded-xl h-28"
+            class="mrs-input"
+            style="height: 112px; resize: vertical"
           ></textarea>
-
-          <input
-            type="text"
-            placeholder="Location"
-            class="w-full border p-3 rounded-xl"
-          />
-          <input
-            type="text"
-            placeholder="EmployeeNotes"
-            class="w-full border p-3 rounded-xl"
-          />
-
-          <input type="file" class="w-full border p-3 rounded-xl" />
-
-          <button
-            type="submit"
-            class="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold"
-          >
-            Submit Request
-          </button>
+          <input type="text" placeholder="Location" class="mrs-input" />
+          <input type="text" placeholder="EmployeeNotes" class="mrs-input" />
+          <input type="file" class="mrs-input" />
+          <button type="submit" class="btn-submit">Submit Request</button>
         </form>
       </div>
     </div>
 
-    <div
-      id="detailsModal"
-      class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm items-center justify-center z-50"
-    >
-      <div
-        class="bg-white w-[750px] max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl p-6"
-      >
-        <!-- Header -->
-        <div class="flex justify-between items-center border-b pb-4 mb-5">
-          <h2 class="text-2xl font-bold text-gray-800">Request Details</h2>
-
-          <button
-            onclick="closeDetails()"
-            class="hover:bg-gray-100 p-2 rounded-full transition"
-          >
+    <!-- Details Modal -->
+    <div id="detailsModal" class="mrs-modal-overlay">
+      <div class="mrs-modal" style="max-width: 750px">
+        <div
+          class="mrs-modal-header"
+          style="border-bottom: 1px solid #eee; padding-bottom: 16px"
+        >
+          <h2>Request Details</h2>
+          <button class="close-btn" onclick="closeDetails()">
             <span class="material-symbols-outlined">close</span>
           </button>
         </div>
-
-        <!-- Content Grid -->
-        <div class="grid grid-cols-2 gap-4 text-sm">
-          <div class="bg-gray-50 p-3 rounded-xl">
-            <p class="text-gray-400 text-xs">Title</p>
-            <p id="title" class="font-semibold text-gray-800"></p>
+        <div class="detail-grid mt-3">
+          <div class="detail-cell">
+            <p class="cell-label">Title</p>
+            <p id="title" class="cell-value"></p>
           </div>
-
-          <div class="bg-gray-50 p-3 rounded-xl">
-            <p class="text-gray-400 text-xs">Status</p>
-            <p id="status" class="font-semibold"></p>
+          <div class="detail-cell">
+            <p class="cell-label">Status</p>
+            <p id="status" class="cell-value"></p>
           </div>
-
-          <div class="bg-gray-50 p-3 rounded-xl col-span-2">
-            <p class="text-gray-400 text-xs">Description</p>
-            <p id="description" class="font-semibold text-gray-800"></p>
+          <div class="detail-cell full">
+            <p class="cell-label">Description</p>
+            <p id="description" class="cell-value"></p>
           </div>
-
-          <div class="bg-gray-50 p-3 rounded-xl">
-            <p class="text-gray-400 text-xs">Employee</p>
-            <p id="employee" class="font-semibold"></p>
+          <div class="detail-cell">
+            <p class="cell-label">Employee</p>
+            <p id="employee" class="cell-value"></p>
           </div>
-
-          <div class="bg-gray-50 p-3 rounded-xl">
-            <p class="text-gray-400 text-xs">Technician</p>
-            <p id="technician" class="font-semibold"></p>
+          <div class="detail-cell">
+            <p class="cell-label">Technician</p>
+            <p id="technician" class="cell-value"></p>
           </div>
-
-          <div class="bg-gray-50 p-3 rounded-xl">
-            <p class="text-gray-400 text-xs">Category</p>
-            <p id="category" class="font-semibold"></p>
+          <div class="detail-cell">
+            <p class="cell-label">Category</p>
+            <p id="category" class="cell-value"></p>
           </div>
-
-          <div class="bg-gray-50 p-3 rounded-xl">
-            <p class="text-gray-400 text-xs">Created At</p>
-            <p id="createdAt" class="font-semibold"></p>
+          <div class="detail-cell">
+            <p class="cell-label">Created At</p>
+            <p id="createdAt" class="cell-value"></p>
           </div>
-
-          <div class="bg-gray-50 p-3 rounded-xl col-span-2">
-            <p class="text-gray-400 text-xs">Location</p>
-            <p id="location" class="font-semibold"></p>
+          <div class="detail-cell full">
+            <p class="cell-label">Location</p>
+            <p id="location" class="cell-value"></p>
           </div>
-
-          <div class="bg-gray-50 p-3 rounded-xl">
-            <p class="text-gray-400 text-xs">Employee Notes</p>
+          <div class="detail-cell">
+            <p class="cell-label">Employee Notes</p>
             <p id="employeeNotes"></p>
           </div>
-
-          <div class="bg-gray-50 p-3 rounded-xl">
-            <p class="text-gray-400 text-xs">Technician Notes</p>
+          <div class="detail-cell">
+            <p class="cell-label">Technician Notes</p>
             <p id="technicianNotes"></p>
           </div>
         </div>
-
-        <!-- Image -->
-        <div class="mt-5">
-          <p class="text-xs text-gray-400 mb-2">Image</p>
+        <div class="mt-4">
+          <p style="font-size: 0.75rem; color: #aaa; margin-bottom: 8px">
+            Image
+          </p>
           <img
             id="requestImage"
-            class="rounded-2xl w-full h-[300px] object-cover border shadow-sm"
+            style="
+              border-radius: 16px;
+              width: 100%;
+              height: 300px;
+              object-fit: cover;
+              border: 1px solid #eee;
+            "
           />
         </div>
       </div>
     </div>
-    <!-- Edit Request Modal -->
-    <div
-      id="editRequestModal"
-      class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50"
-    >
-      <div
-        class="bg-white w-[500px] max-h-[90vh] overflow-y-auto rounded-2xl p-6 shadow-2xl"
-      >
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-5">
-          <h2 class="text-2xl font-bold">Edit Request</h2>
 
-          <button onclick="closeEditModal()">
+    <!-- Edit Request Modal -->
+    <div id="editRequestModal" class="mrs-modal-overlay">
+      <div class="mrs-modal" style="max-width: 500px">
+        <div class="mrs-modal-header">
+          <h2>Edit Request</h2>
+          <button class="close-btn" onclick="closeEditModal()">
             <span class="material-symbols-outlined">close</span>
           </button>
         </div>
-
-        <!-- Form -->
-        <form id="editRequestForm" class="space-y-4">
-          <!-- Category -->
+        <form id="editRequestForm" class="d-flex flex-column gap-3">
           <div>
-            <label class="block mb-1 text-sm text-gray-500"> Category </label>
-
-            <select
-              id="editCategorySelect"
-              class="w-full border p-3 rounded-xl"
-            ></select>
+            <label class="mrs-label">Category</label>
+            <select id="editCategorySelect" class="mrs-input"></select>
           </div>
-
-          <!-- Title -->
           <div>
-            <label class="block mb-1 text-sm text-gray-500"> Title </label>
-
+            <label class="mrs-label">Title</label>
             <input
               id="editTitle"
               type="text"
               placeholder="Enter title"
-              class="w-full border p-3 rounded-xl"
+              class="mrs-input"
             />
           </div>
-
-          <!-- Description -->
           <div>
-            <label class="block mb-1 text-sm text-gray-500">
-              Description
-            </label>
-
+            <label class="mrs-label">Description</label>
             <textarea
               id="editDescription"
               placeholder="Enter description"
-              class="w-full border p-3 rounded-xl h-28"
+              class="mrs-input"
+              style="height: 112px; resize: vertical"
             ></textarea>
           </div>
-
-          <!-- Location -->
           <div>
-            <label class="block mb-1 text-sm text-gray-500"> Location </label>
-
+            <label class="mrs-label">Location</label>
             <input
               id="editLocation"
               type="text"
               placeholder="Enter location"
-              class="w-full border p-3 rounded-xl"
+              class="mrs-input"
             />
           </div>
-
-          <!-- Employee Notes -->
           <div>
-            <label class="block mb-1 text-sm text-gray-500">
-              Employee Notes
-            </label>
-
+            <label class="mrs-label">Employee Notes</label>
             <input
               id="editEmployeeNotes"
               type="text"
               placeholder="Enter notes"
-              class="w-full border p-3 rounded-xl"
+              class="mrs-input"
             />
           </div>
-
-          <!-- Image -->
           <div>
-            <label class="block mb-1 text-sm text-gray-500">
-              Upload Image
-            </label>
-
-            <input
-              id="editImage"
-              type="file"
-              class="w-full border p-3 rounded-xl"
-            />
+            <label class="mrs-label">Upload Image</label>
+            <input id="editImage" type="file" class="mrs-input" />
           </div>
-
-          <!-- Submit -->
-          <button
-            type="submit"
-            class="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
-          >
-            Update Request
-          </button>
+          <button type="submit" class="btn-submit">Update Request</button>
         </form>
       </div>
     </div>
-    <!-- Delete Confirmation Modal -->
-    <div
-      id="deleteModal"
-      class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50"
-    >
-      <div class="bg-white w-[400px] rounded-2xl p-6 shadow-2xl">
-        <!-- Icon -->
-        <div class="flex justify-center mb-4">
-          <div
-            class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center"
+
+    <!-- Delete  Confirmation Modal -->
+    <div id="deleteModal" class="mrs-modal-overlay">
+      <div class="mrs-modal" style="max-width: 400px">
+        <div class="delete-icon-wrap">
+          <span
+            class="material-symbols-outlined"
+            style="color: #dc2626; font-size: 2.25rem"
+            >delete</span
           >
-            <span class="material-symbols-outlined text-red-600 text-4xl">
-              delete
-            </span>
-          </div>
         </div>
-
-        <!-- Title -->
-        <h2 class="text-xl font-bold text-center mb-2">Delete Request</h2>
-
-        <!-- Message -->
-        <p class="text-sm text-gray-500 text-center mb-6">
+        <h2
+          style="
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+          "
+        >
+          Delete Request
+        </h2>
+        <p
+          style="
+            text-align: center;
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 24px;
+          "
+        >
           Are you sure you want to delete this request?
         </p>
-
-        <!-- Buttons -->
-        <div class="flex gap-3">
-          <!-- Cancel -->
-          <button
-            onclick="closeDeleteModal()"
-            class="flex-1 border border-gray-300 py-3 rounded-xl text-gray-700 hover:bg-gray-100 transition"
-          >
+        <div class="d-flex gap-3">
+          <button class="btn-cancel-del" onclick="closeDeleteModal()">
             Cancel
           </button>
-
-          <!-- Yes -->
-          <button
-            onclick="confirmDelete()"
-            class="flex-1 bg-red-600 text-white py-3 rounded-xl hover:bg-red-700 transition"
-          >
+          <button class="btn-confirm-del" onclick="confirmDelete()">
             Yes, Delete
           </button>
         </div>
       </div>
     </div>
-    <!-- History Modal -->
-    <div
-      id="historyModal"
-      class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50"
-    >
-      <div
-        class="bg-white w-[700px] max-h-[90vh] overflow-y-auto rounded-2xl p-6 shadow-2xl"
-      >
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-2xl font-bold">Request History</h2>
 
-          <button onclick="closeHistoryModal()">
-            <span class="material-symbols-outlined"> close </span>
+    <!-- History Modal -->
+    <div id="historyModal" class="mrs-modal-overlay">
+      <div class="mrs-modal" style="max-width: 700px">
+        <div class="mrs-modal-header">
+          <h2>Request History</h2>
+          <button class="close-btn" onclick="closeHistoryModal()">
+            <span class="material-symbols-outlined">close</span>
           </button>
         </div>
-
-        <!-- History Container -->
-        <div id="historyContainer" class="space-y-4"></div>
+        <div id="historyContainer" class="d-flex flex-column gap-3"></div>
       </div>
     </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="mrs.js"></script>
   </body>
 </html>
