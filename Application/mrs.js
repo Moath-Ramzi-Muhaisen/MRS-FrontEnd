@@ -5,27 +5,28 @@ let deleteUserId = null;
 let currentRequestId = null;
 let allTechnicians = [];
 let currentEmployeeId = null;
+let editEmployeeModal;
+let requestidforstates = null;
+let currentNotesRequestId = null;
 
 // ─── Modal Helpers (Bootstrap version) ───────────────────────────────────────
 function showModal(id) {
   const modal = document.getElementById(id);
+
   if (modal) {
-    modal.style.display = "block";
-    modal.classList.add("show");
+    modal.classList.remove("hidden");
+    modal.classList.add("flex", "show");
   }
 }
 
 function hideModal(id) {
   const modal = document.getElementById(id);
+
   if (modal) {
-    modal.style.display = "none";
-    modal.classList.remove("show");
+    modal.classList.add("hidden");
+    modal.classList.remove("flex", "show");
   }
 }
-// في آخر renderTableTechnicians بعد الـ forEach
-document.querySelectorAll('[data-bs-toggle="popover"]').forEach((el) => {
-  new bootstrap.Popover(el);
-});
 
 // ─── Login ────────────────────────────────────────────────────────────────────
 async function Login() {
@@ -53,9 +54,49 @@ async function Login() {
   }
 }
 
+function openAddNotesModal(id) {
+  currentNotesRequestId = id;
+  document.getElementById("technicianNotesInput").value = "";
+  document.getElementById("addNotesModal").style.display = "flex";
+}
+
+function closeAddNotesModal() {
+  document.getElementById("addNotesModal").style.display = "none";
+}
+
+async function submitAddNotes() {
+  const notes = document.getElementById("technicianNotesInput").value.trim();
+
+  if (!notes) {
+    alert("Please write some notes first!");
+    return;
+  }
+  const token = localStorage.getItem("token");
+  try {
+    const response = await fetch(
+      `http://localhost:8080/api/Request/Add_Technician_Notes?requestId=${currentNotesRequestId}&notes=${encodeURIComponent(notes)}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    if (response.ok) {
+      closeAddNotesModal();
+    } else {
+      alert("Something went wrong!");
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
 // ─── Fetch Requests ───────────────────────────────────────────────────────────
 async function GetRequestsCurrantTechnicianOrEmployee() {
   const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
   try {
     const response = await fetch(
       "http://localhost:8080/api/Request/Get_Requests_Currant_Technician_Or_Employee",
@@ -67,9 +108,14 @@ async function GetRequestsCurrantTechnicianOrEmployee() {
         },
       },
     );
+
     const data = await response.json();
     allRequests = data;
-    renderTable(allRequests);
+    if (role === "Technician") {
+      renderTableForTc(allRequests);
+    } else {
+      renderTable(allRequests);
+    }
   } catch (error) {
     console.log(error);
   }
@@ -132,6 +178,76 @@ async function GetAllRequests() {
     const data = await response.json();
     allRequests = data;
     renderTable(allRequests);
+  } catch (error) {
+    console.log(error);
+  }
+}
+async function GetAllTitleRequests() {
+  const token = localStorage.getItem("token");
+
+  try {
+    const response = await fetch(
+      "http://localhost:8080/api/Request/Get_All_Requests",
+      {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    const data = await response.json();
+
+    const select = document.getElementById("requestSelect");
+
+    // تنظيف القديم
+    select.innerHTML = "";
+
+    data.forEach((element) => {
+      if (element.status == 1) {
+        const option = document.createElement("option");
+
+        option.value = element.id;
+        option.textContent = `${element.title} - ${element.categoryName}`;
+
+        select.appendChild(option);
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+async function GetAllNameTechnicians() {
+  const token = localStorage.getItem("token");
+
+  try {
+    const response = await fetch(
+      "http://localhost:8080/api/User/Get_Users_Technicians",
+      {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    const data = await response.json();
+
+    const select = document.getElementById("technicianSelect");
+
+    // تنظيف القديم
+    select.innerHTML = "";
+
+    data.forEach((element) => {
+      const option = document.createElement("option");
+
+      option.value = element.id;
+      option.textContent = element.name;
+
+      select.appendChild(option);
+    });
   } catch (error) {
     console.log(error);
   }
@@ -222,6 +338,131 @@ function renderTable(data) {
   `;
   });
 }
+function renderTableForTc(data) {
+  const tbody = document.getElementById("bodyTc");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+
+  data.forEach((element) => {
+    const ui = getStatusUI(element.statusName);
+
+    tbody.innerHTML += `
+      <tr
+        style="transition: background 0.2s; cursor:default;"
+        onmouseover="this.style.backgroundColor='var(--surface-container-low)'"
+        onmouseout="this.style.backgroundColor=''"
+      >
+        <td style="padding:14px 24px; color:var(--on-surface); font-weight:500; vertical-align:middle;">
+        ${element.id}
+      </td>
+
+        <td style="padding:14px 24px; vertical-align:middle;">
+          <div style="font-weight:600; color:var(--on-surface);">${element.title}</div>
+          <div style="font-size:0.8rem; color:var(--on-surface-variant); margin-top:2px;">${element.requestDetail.location}</div>
+      </td>
+
+        <td style="padding:14px 24px; color:var(--on-surface); vertical-align:middle;">
+        ${element.categoryName}
+      </td>
+
+        <td style="padding:14px 24px; vertical-align:middle;">
+          <span class="status-badge ${ui.cls}"
+                onmouseover="this.style.transform='scale(1.07)'"
+              onmouseout="this.style.transform='scale(1)'">
+            <span class="material-symbols-outlined" style="font-size:16px; line-height:1;">${ui.icon}</span>
+          ${element.statusName}
+        </span>
+      </td>
+
+        <td style="padding:14px 24px; vertical-align:middle;">
+          <span style="font-weight:500; color:var(--on-surface);">${element.employeeName}</span>
+      </td>
+
+        <td style="padding:14px 24px; vertical-align:middle;">
+          <div style="display:flex; align-items:center; justify-content:center; gap:6px;">
+
+          <button
+              onclick="openDetails(); getDetails('${element.id}')"
+              class="action-btn primary-action"
+            title="Details"
+          >
+              <span class="material-symbols-outlined" style="font-size:19px;">visibility</span>
+          </button>
+
+          <button
+              onclick="openEditStatusModal('${element.id}')"
+              class="action-btn primary-action"
+            title="Edit"
+          >
+              <span class="material-symbols-outlined" style="font-size:19px;">edit</span>
+          </button>
+
+           <button
+            onclick="openAddNotesModal('${element.id}')"
+              class="action-btn ghost-action"
+            title="History"
+          >
+              <span class="material-symbols-outlined" style="font-size:19px;">add</span>
+          </button>
+
+          <button
+            onclick="openHistoryModal('${element.id}')"
+              class="action-btn ghost-action"
+            title="History"
+          >
+              <span class="material-symbols-outlined" style="font-size:19px;">history</span>
+          </button>
+
+        </div>
+      </td>
+    </tr>
+  `;
+  });
+}
+document
+  .getElementById("editStatusForm")
+  .addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const statusMap = {
+      New: 1,
+      Assigned: 2,
+      InProgress: 3,
+      Resolved: 4,
+      Done: 5,
+    };
+
+    const selectedStatus = document.getElementById("statusSelect").value;
+    const comment = document.getElementById("statusComment").value;
+
+    const body = {
+      newStatus: statusMap[selectedStatus],
+      comment: comment || null,
+    };
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/Request/Update_Status?id=${requestidforstates}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer " + token,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        },
+      );
+
+      if (response.ok) {
+        closeEditStatusModal();
+        GetRequestsCurrantTechnicianOrEmployee();
+      } else {
+        alert("Something went wrong!");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  });
 
 // ─── Render Users Table ───────────────────────────────────────────────────────
 function renderTableUser(data) {
@@ -319,6 +560,9 @@ function renderTableTechnicians(data) {
       container: "body",
     });
   });
+  document.querySelectorAll('[data-bs-toggle="popover"]').forEach((el) => {
+    new bootstrap.Popover(el);
+  });
 }
 // ─── Filter ───────────────────────────────────────────────────────────────────
 function filterByStatus(status) {
@@ -367,7 +611,40 @@ async function loadStatsAdmin() {
   document.getElementById("ProgressAdmin").innerText = data.inProgressRequests;
   document.getElementById("DoneAdmin").innerText = data.doneRequests;
 }
+document
+  .getElementById("assignTechnicianForm")
+  .addEventListener("submit", async function (e) {
+    e.preventDefault();
 
+    const requestId = document.getElementById("requestSelect").value;
+    const technicianId = document.getElementById("technicianSelect").value;
+
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/Request/Assign_Technician?requestId=${requestId}&technicianId=${technicianId}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer " + token,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      if (response.ok) {
+        closeAssignTechnicianModal();
+        GetAllRequests();
+        GetAllTitleRequests();
+        GetAllNameTechnicians();
+      } else {
+        console.log("Failed to assign technician");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  });
 // ─── Modal Open / Close ───────────────────────────────────────────────────────
 function openModal() {
   showModal("requestModal");
@@ -416,15 +693,42 @@ function openDeleteTechnicians(id) {
 function closeDeleteTechnicians() {
   hideModal("deleteModalTechnicians");
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  editEmployeeModal = new bootstrap.Modal(
+    document.getElementById("editEmployeeModal"),
+  );
+});
+
 function openEditEmployee(id) {
   currentEmployeeId = id;
-  showModal("editEmployeeModal");
+
+  editEmployeeModal.show();
 }
 
 function closeEditEmployeeModal() {
-  hideModal("editEmployeeModal");
+  editEmployeeModal.hide();
 }
 
+function openAssignTechnicianModal() {
+  const modal = document.getElementById("assignTechnicianModal");
+  modal.style.display = "flex";
+}
+
+function closeAssignTechnicianModal() {
+  const modal = document.getElementById("assignTechnicianModal");
+  modal.style.display = "none";
+}
+function openEditStatusModal(id) {
+  requestidforstates = id;
+  const modal = document.getElementById("editStatusModal");
+  modal.style.display = "flex";
+}
+
+function closeEditStatusModal() {
+  const modal = document.getElementById("editStatusModal");
+  modal.style.display = "none";
+}
 // ─── Categories ───────────────────────────────────────────────────────────────
 async function loadCategories() {
   try {
