@@ -729,7 +729,7 @@ function closeEditStatusModal() {
   const modal = document.getElementById("editStatusModal");
   modal.style.display = "none";
 }
-// ─── Categories ───────────────────────────────────────────────────────────────
+/// ─── Categories ───────────────────────────────────────────────────────────────
 async function loadCategories() {
   try {
     const token = localStorage.getItem("token");
@@ -742,6 +742,31 @@ async function loadCategories() {
     );
     const data = await res.json();
 
+    // ─── Checkboxes for #category ────────────────────────────
+    const categoryContainer = document.getElementById("category");
+    if (categoryContainer) {
+      categoryContainer.innerHTML = ""; // clear old
+      data.forEach((category) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "form-check";
+
+        wrapper.innerHTML = `
+          <input 
+            class="form-check-input" 
+            type="checkbox" 
+            value="${category.id}" 
+            id="cat_${category.id}"
+            name="categoryCheckbox"
+          />
+          <label class="form-check-label" for="cat_${category.id}">
+            ${category.name}
+          </label>
+        `;
+        categoryContainer.appendChild(wrapper);
+      });
+    }
+
+    // ─── Regular selects (باقي الـ dropdowns) ────────────────
     const selectors = [
       "categorySelect",
       "editCategorySelect",
